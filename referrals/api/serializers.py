@@ -25,7 +25,7 @@ class CompanySerializer(serializers.ModelSerializer):
 class IndividualSerializer(serializers.ModelSerializer):
     class Meta:
         model = Individual
-        fields = ('first_name', 'last_name', 'email', 'password')
+        fields = ('first_name', 'last_name', 'gender', 'phone_no', 'address', 'country', 'state', 'city', 'email', 'password')
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -35,6 +35,12 @@ class IndividualSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
+            gender=validated_data['gender'],
+            phone_no=validated_data['phone_no'],
+            address=validated_data.get('address', ''),
+            country=validated_data.get('country', ''),
+            state=validated_data['state'],
+            city=validated_data['city'],
         )
         user.set_password(validated_data['password'])
         user.save()

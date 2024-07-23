@@ -10,18 +10,29 @@ from django.contrib.auth.models import User
 #     def __str__(self):
 #         return f"{self.link} - {self.user.user.username}"
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
+    photo = models.ImageField(upload_to="profile_photos/", null=True, blank=True)
     business_name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     country = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     phone_no = models.CharField(max_length=20)
-    left_child = models.OneToOneField('self', null=True, blank=True, related_name='left', on_delete=models.SET_NULL)
-    right_child = models.OneToOneField('self', null=True, blank=True, related_name='right', on_delete=models.SET_NULL)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.SET_NULL)
+    left_child = models.OneToOneField(
+        "self", null=True, blank=True, related_name="left", on_delete=models.SET_NULL
+    )
+    right_child = models.OneToOneField(
+        "self", null=True, blank=True, related_name="right", on_delete=models.SET_NULL
+    )
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        related_name="children",
+        on_delete=models.SET_NULL,
+    )
 
     def __str__(self):
         return self.user.username
@@ -48,11 +59,14 @@ class Profile(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    photo = models.ImageField(upload_to='product_photos/', null=True, blank=True)
-    status = models.CharField(max_length=50, choices=[
-        ('available', 'Available'),
-        ('non_available', 'Non Available'),
-    ])
+    photo = models.ImageField(upload_to="product_photos/", null=True, blank=True)
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ("available", "Available"),
+            ("non_available", "Non Available"),
+        ],
+    )
     description = models.TextField()
     shares = models.IntegerField(default=0, blank=True)
     traffic = models.IntegerField(default=0, blank=True)
@@ -68,16 +82,17 @@ class SupportTicket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     subject = models.CharField(max_length=255)
-    status = models.CharField(max_length=50, choices=[
-        ('open', 'Open'),
-        ('in_progress', 'In Progress'),
-        ('resolved', 'Resolved')
-    ])
-    priority = models.CharField(max_length=50, choices=[
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High')
-    ])
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ("open", "Open"),
+            ("in_progress", "In Progress"),
+            ("resolved", "Resolved"),
+        ],
+    )
+    priority = models.CharField(
+        max_length=50, choices=[("low", "Low"), ("medium", "Medium"), ("high", "High")]
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -89,10 +104,13 @@ class Wallet(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
-    status = models.CharField(max_length=50, choices=[
-        ('successful', 'Successful'),
-        ('declined', 'Declined'),
-    ])
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ("successful", "Successful"),
+            ("declined", "Declined"),
+        ],
+    )
 
     def __str__(self):
         return f"{self.id} - {self.status}"
@@ -100,21 +118,23 @@ class Wallet(models.Model):
 
 class Payout(models.Model):
     PAYMENT_METHOD_CHOICES = [
-        ('bank_transfer', 'Bank Transfer'),
-        ('paypal', 'PayPal'),
-        ('credit_card', 'Credit Card'),
+        ("bank_transfer", "Bank Transfer"),
+        ("paypal", "PayPal"),
+        ("credit_card", "Credit Card"),
     ]
 
     STATUS_CHOICES = [
-        ('paid', 'Paid'),
-        ('pending', 'Pending'),
+        ("paid", "Paid"),
+        ("pending", "Pending"),
     ]
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, unique=True
+    )
     date = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
     def __str__(self):
         return f"Payout {self.id} - {self.amount} {self.get_status_display()}"

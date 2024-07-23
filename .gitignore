@@ -46,8 +46,8 @@ local_settings.py
 .cache/
 
 # Migrations
-migrations/
-*/migrations/*
+# migrations/
+# */migrations/*
 
 # Pip
 pip-log.txt

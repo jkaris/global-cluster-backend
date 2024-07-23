@@ -24,6 +24,7 @@ class CompanySerializer(serializers.ModelSerializer):
             phone_no=validated_data.get("phone_no", ""),
             country=validated_data.get("country", ""),
             company_registration_no=validated_data["company_registration_no"],
+            user_type="company",
         )
         user.set_password(validated_data["password"])
         user.save()
@@ -58,6 +59,7 @@ class IndividualSerializer(serializers.ModelSerializer):
             country=validated_data.get("country", ""),
             state=validated_data["state"],
             city=validated_data["city"],
+            user_type="individual",
         )
         user.set_password(validated_data["password"])
         user.save()

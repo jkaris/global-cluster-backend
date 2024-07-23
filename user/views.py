@@ -1,6 +1,11 @@
 from rest_framework import generics
 from .models import Product, SupportTicket, Wallet, Payout
-from .serializers import ProductSerializer, SupportTicketSerializer, WalletSerializer, PayoutSerializer
+from .serializers import (
+    ProductSerializer,
+    SupportTicketSerializer,
+    WalletSerializer,
+    PayoutSerializer,
+)
 from .models import Profile
 from .serializers import ProfileSerializer
 
@@ -48,6 +53,7 @@ class WalletRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 class PayoutListCreate(generics.ListCreateAPIView):
     queryset = Payout.objects.all()
     serializer_class = PayoutSerializer
+
 
 class PayoutRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Payout.objects.all()

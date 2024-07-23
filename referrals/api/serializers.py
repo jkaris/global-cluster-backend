@@ -12,8 +12,10 @@ class CompanySerializer(serializers.ModelSerializer):
             "phone_no",
             "country",
             "company_registration_no",
+            "user_type",
             "password",
         )
+        read_only_fields = ("user_type",)
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -44,8 +46,10 @@ class IndividualSerializer(serializers.ModelSerializer):
             "state",
             "city",
             "email",
+            "user_type",
             "password",
         )
+        read_only_fields = ("user_type",)
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):

@@ -21,6 +21,7 @@ class LoginView(APIView):
                     "access": str(refresh.access_token),
                     "user_id": user.pk,
                     "email": user.email,
+                    "user_type": user.user_type,
                 }
             )
         else:

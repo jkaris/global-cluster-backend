@@ -1,8 +1,5 @@
 from django.contrib import admin
-from .models import User, Referral
+from .models import Company, Individual
 
-
-admin.site.register(User)
-admin.site.register(Referral)
-
-### making the admin interface
+admin.site.register(Company)
+admin.site.register(Individual)

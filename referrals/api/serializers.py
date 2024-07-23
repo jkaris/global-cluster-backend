@@ -1,15 +1,45 @@
 from rest_framework import serializers
-from ..models import User, Referral
+from ..models import Company, Individual
 
-class UserSerializer(serializers.ModelSerializer):
+class CompanySerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'referred_by', 'balance']
+        model = Company
+        fields = ('company_name', 'email', 'address', 'phone_no', 'country', 'company_registration_no', 'password')
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
-class ReferralSerializer(serializers.ModelSerializer):
-    referrer = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    referred = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    def create(self, validated_data):
+        user = Company(
+            email=validated_data['email'],
+            company_name=validated_data['company_name'],
+            address=validated_data.get('address', ''),
+            phone_no=validated_data.get('phone_no', ''),
+            country=validated_data.get('country', ''),
+            company_registration_no=validated_data['company_registration_no'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
+class IndividualSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Referral
-        fields = ['id', 'referrer', 'referred', 'reward_amount', 'created_at']
+        model = Individual
+        fields = ('first_name', 'last_name', 'email', 'password')
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        user = Individual(
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)

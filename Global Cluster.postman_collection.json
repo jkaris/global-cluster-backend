@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "6b6da61e-df20-4042-a665-a18dd16fce37",
+		"name": "Global Cluster",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23014112",
+		"_collection_link": "https://mutemip-1762.postman.co/workspace/Mutemip-Workspace~4057da92-03c7-43d8-8222-ae0d3b323e39/collection/23014112-6b6da61e-df20-4042-a665-a18dd16fce37?action=share&source=collection_link&creator=23014112"
+	},
+	"item": [
+		{
+			"name": "profiles",
+			"item": [
+				{
+					"name": "Register a Business",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "company_name",
+									"value": "Pupl",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "po@test.com",
+									"type": "text"
+								},
+								{
+									"key": "company_registration_no",
+									"value": "PO124",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Qwer123!!",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "123",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Kenya",
+									"type": "text"
+								},
+								{
+									"key": "phone_no",
+									"value": "0713245678",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{BASE_URL}}/register/company/"
+					},
+					"response": []
+				},
+				{
+					"name": "Register Individual Account",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Pupl",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "pl@test.com",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "mute",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Qwerty123!@",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{BASE_URL}}/register/individual/"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "po@test.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Qwer123!!",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{BASE_URL}}/login/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "products",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "support_tickets",
+			"item": []
+		},
+		{
+			"name": "wallets",
+			"item": []
+		},
+		{
+			"name": "payouts",
+			"item": []
+		}
+	]
+}

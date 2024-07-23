@@ -1,27 +1,34 @@
-from rest_framework import viewsets, status
+from rest_framework import generics, status
 from rest_framework.response import Response
-from django.db import transaction
-from ..models import User, Referral
-from .serializers import UserSerializer, ReferralSerializer
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from ..models import Company, Individual
+from .serializers import CompanySerializer, IndividualSerializer
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class LoginView(APIView):
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        user = authenticate(request, email=email, password=password)
 
-    def create(self, request, *args, **kwargs):
-        referred_by_id = request.data.get('referred_by')
-        with transaction.atomic():
-            user = User.objects.create_user(
-                username=request.data['username'],
-                email=request.data['email'],
-                password=request.data['password'],
-                referred_by_id=referred_by_id
-            )
-            if referred_by_id:
-                referrer = User.objects.get(id=referred_by_id)
-                referral = Referral.objects.create(referrer=referrer, referred=user)
-                referrer.balance += referral.reward_amount
-                referrer.save()
-        
-        serializer = self.get_serializer(user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user_id': user.pk,
+                'email': user.email,
+            })
+        else:
+            return Response({"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+class CompanyCreateView(generics.CreateAPIView):
+    queryset = Company.objects.all()
+    serializer_class = CompanySerializer
+
+class IndividualCreateView(generics.CreateAPIView):
+    queryset = Individual.objects.all()
+    serializer_class = IndividualSerializer
+
+

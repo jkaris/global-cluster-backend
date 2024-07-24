@@ -6,6 +6,7 @@ from .views import (
     ProductDetailAPIView,
     ProductListCreateAPIView,
     SupportTicketViewSet,
+    UserRankingViewSet,
 )
 
 urlpatterns = [
@@ -22,5 +23,10 @@ urlpatterns = [
         "support-tickets/",
         SupportTicketViewSet.as_view({"get": "list"}),
         name="support-ticket-list",
+    ),
+    path(
+        "user-ranking/",
+        UserRankingViewSet.as_view({"get": "list"}),
+        name="user-ranking",
     ),
 ]

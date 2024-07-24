@@ -15,19 +15,11 @@ class CompanySerializer(serializers.ModelSerializer):
             "user_type",
             "password",
         )
-        read_only_fields = ("user_type",)
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        user = Company(
-            email=validated_data["email"],
-            company_name=validated_data["company_name"],
-            address=validated_data.get("address", ""),
-            phone_no=validated_data.get("phone_no", ""),
-            country=validated_data.get("country", ""),
-            company_registration_no=validated_data["company_registration_no"],
-            user_type="company",
-        )
+        validated_data["user_type"] = "company"
+        user = Company(**validated_data)
         user.set_password(validated_data["password"])
         user.save()
         return user
@@ -49,22 +41,11 @@ class IndividualSerializer(serializers.ModelSerializer):
             "user_type",
             "password",
         )
-        read_only_fields = ("user_type",)
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        user = Individual(
-            email=validated_data["email"],
-            first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"],
-            gender=validated_data["gender"],
-            phone_no=validated_data["phone_no"],
-            address=validated_data.get("address", ""),
-            country=validated_data.get("country", ""),
-            state=validated_data["state"],
-            city=validated_data["city"],
-            user_type="individual",
-        )
+        validated_data["user_type"] = "company"
+        user = Individual(**validated_data)
         user.set_password(validated_data["password"])
         user.save()
         return user
@@ -72,4 +53,5 @@ class IndividualSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    user_type = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)

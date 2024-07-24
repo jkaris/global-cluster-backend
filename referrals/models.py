@@ -35,8 +35,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     user_type = models.CharField(
         max_length=20,
-        choices=[("individual", "Individual"), ("company", "Company")],
-        default="individual",
+        choices=[
+            ("individual", "Individual"),
+            ("company", "Company"),
+            ("admin", "Admin"),
+        ],
     )
 
     objects = CustomUserManager()

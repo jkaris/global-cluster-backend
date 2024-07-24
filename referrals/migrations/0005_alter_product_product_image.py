@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                     django.core.validators.FileExtensionValidator(
                         allowed_extensions=["png", "jpg", "jpeg", "tiff"]
                     ),
-                    referrals.validators.validate_image_size,
+                    referrals.validators.validate_file_size,
                 ],
             ),
         ),

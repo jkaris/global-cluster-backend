@@ -5,6 +5,15 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from uuid import uuid4
+from django.utils import timezone
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+    FileExtensionValidator,
+)
+
+from .validators import validate_image_size
 
 
 class CustomUserManager(BaseUserManager):
@@ -76,3 +85,45 @@ class Individual(CustomUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class Product(models.Model):
+    """
+    Product model for the referral program.
+    """
+
+    uuid = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    product_name = models.CharField(max_length=255)
+    company = models.ForeignKey(
+        Company, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    description = models.TextField()
+    product_image = models.ImageField(
+        upload_to="product_images/",
+        validators=[
+            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "tiff"]),
+            validate_image_size,
+        ],
+    )
+    product_link = models.CharField(max_length=255)
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("active", "Active"),
+        ("declined", "Declined"),
+    ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    shares = models.PositiveIntegerField(
+        default=0, validators=[MaxValueValidator(1_000_000_000)]
+    )
+    traffic = models.PositiveIntegerField(
+        default=0, validators=[MaxValueValidator(1_000_000_000)]
+    )
+
+    class Meta:
+        verbose_name = "Product"
+        verbose_name_plural = "Products"
+
+    def __str__(self):
+        return self.product_name

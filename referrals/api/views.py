@@ -4,30 +4,45 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from ..models import Company, Individual
-from .serializers import CompanySerializer, IndividualSerializer
+from .serializers import CompanySerializer, IndividualSerializer, LoginSerializer
 
 
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
-        email = request.data.get("email")
-        password = request.data.get("password")
-        user = authenticate(request, email=email, password=password)
-
-        if user is not None:
-            refresh = RefreshToken.for_user(user)
-            return Response(
-                {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                    "user_id": user.pk,
-                    "email": user.email,
-                    "user_type": user.user_type,
-                }
-            )
-        else:
-            return Response(
-                {"detail": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
-            )
+        """
+        Handle the POST request for the login API.
+        Parameters:
+            request (HttpRequest): The HTTP request object.
+            args (tuple): Additional positional arguments.
+            kwargs (dict): Additional keyword arguments.
+        Returns:
+        Response:
+            The HTTP response object.
+        Raises:
+            None.
+        """
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data["email"]
+            password = serializer.validated_data["password"]
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                refresh = RefreshToken.for_user(user)
+                return Response(
+                    {
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                        "user_id": user.pk,
+                        "email": user.email,
+                        "user_type": user.user_type,
+                    }
+                )
+            else:
+                return Response(
+                    {"detail": "Invalid credentials"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CompanyCreateView(generics.CreateAPIView):

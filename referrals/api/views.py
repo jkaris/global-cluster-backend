@@ -3,13 +3,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from ..models import Company, Individual, Product, SupportTicket
+from ..models import Company, Individual, Product, SupportTicket, UserRanking
 from .serializers import (
     CompanySerializer,
     IndividualSerializer,
     LoginSerializer,
     ProductSerializer,
     SupportTicketSerializer,
+    UserRankingSerializer,
 )
 from django.shortcuts import get_object_or_404
 
@@ -134,3 +135,8 @@ class SupportTicketViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save()
+
+
+class UserRankingViewSet(viewsets.ModelViewSet):
+    queryset = UserRanking.objects.all()
+    serializer_class = UserRankingSerializer

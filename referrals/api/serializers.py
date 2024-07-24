@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ..models import Company, Individual, Product
+from ..models import Company, Individual, Product, SupportTicket
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -61,3 +61,23 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
+
+
+class SupportTicketSerializer(serializers.ModelSerializer):
+    submitted_by = serializers.ReadOnlyField(source="submitted_by.username")
+
+    class Meta:
+        model = SupportTicket
+        fields = [
+            "uuid",
+            "date_created",
+            "date_updated",
+            "submitted_by",
+            "support",
+            "title",
+            "description",
+            "status",
+            "priority",
+            "attachments",
+        ]
+        read_only_fields = ["uuid", "date_created", "date_updated", "submitted_by"]

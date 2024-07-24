@@ -4,6 +4,9 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 from uuid import uuid4
 from django.utils import timezone
@@ -12,8 +15,9 @@ from django.core.validators import (
     MinValueValidator,
     FileExtensionValidator,
 )
+from .validators import validate_file_size
 
-from .validators import validate_image_size
+User = settings.AUTH_USER_MODEL
 
 
 class CustomUserManager(BaseUserManager):
@@ -104,7 +108,7 @@ class Product(models.Model):
         upload_to="product_images/",
         validators=[
             FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "tiff"]),
-            validate_image_size,
+            validate_file_size,
         ],
     )
     product_link = models.CharField(max_length=255)
@@ -127,3 +131,50 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
+
+
+class SupportTicket(models.Model):
+    """
+    Support ticket model for the referral program.
+    """
+
+    uuid = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    submitted_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="support_tickets"
+    )
+    SUPPORT_CHOICES = [
+        ("support", "Support"),
+        ("suggestion", "Suggestion"),
+    ]
+    support = models.CharField(
+        max_length=15, choices=SUPPORT_CHOICES, default="support"
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    STATUS_CHOICES = [
+        ("in-progress", "In Progress"),
+        ("resolved", "Resolved"),
+    ]
+    status = models.CharField(
+        max_length=15, choices=STATUS_CHOICES, default="in-progress"
+    )
+    PRIORITY_CHOICES = [
+        ("high", "High"),
+        ("medium", "Medium"),
+        ("low", "Low"),
+    ]
+    priority = models.CharField(max_length=15, choices=PRIORITY_CHOICES, default="low")
+    attachments = models.FileField(
+        upload_to="support_ticket_attachments/",
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=["png", "jpg", "jpeg", "tiff", "pdf"]
+            ),
+            validate_file_size,
+        ],
+    )
+
+    def __str__(self):
+        return self.title

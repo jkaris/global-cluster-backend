@@ -2,6 +2,8 @@
 djangoProject1 URL Configuration
 """
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import (
@@ -17,3 +19,8 @@ urlpatterns = [
     path("api/v1/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/v1/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
 ]
+
+if settings.DEBUG:
+    urlpatterns = urlpatterns + static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )

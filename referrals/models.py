@@ -178,3 +178,34 @@ class SupportTicket(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class UserRanking(models.Model):
+    """
+    User ranking model for the referral program.
+    """
+
+    icon = models.ImageField(
+        upload_to="ranking_icons/", validators=[validate_file_size]
+    )
+    user = models.CharField(max_length=255)
+    rank_level = models.IntegerField(default=0)
+    NAME_CHOICES = [
+        ("gold pro", "Gold Pro"),
+        ("gold", "Gold"),
+        ("silver pro", "Silver Pro"),
+        ("silver", "Silver"),
+        ("platinum", "Platinum"),
+    ]
+    name = models.CharField(max_length=15, choices=NAME_CHOICES, default="silver")
+    total_recruits = models.IntegerField(default=0)
+    bonus = models.IntegerField(default=0)
+    STATUS_CHOICES = [
+        ("enabled", "Enabled"),
+        ("disabled", "Disabled"),
+    ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="enabled")
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name

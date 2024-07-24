@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ..models import Company, Individual
+from ..models import Company, Individual, Product
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -55,3 +55,9 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     user_type = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = "__all__"

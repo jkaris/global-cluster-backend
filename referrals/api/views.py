@@ -9,6 +9,18 @@ from .serializers import CompanySerializer, IndividualSerializer, LoginSerialize
 
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
+        """
+        Handle the POST request for the login API.
+        Parameters:
+            request (HttpRequest): The HTTP request object.
+            args (tuple): Additional positional arguments.
+            kwargs (dict): Additional keyword arguments.
+        Returns:
+        Response:
+            The HTTP response object.
+        Raises:
+            None.
+        """
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
@@ -16,21 +28,13 @@ class LoginView(APIView):
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 refresh = RefreshToken.for_user(user)
-                if isinstance(user, Company):
-                    user_type = "company"
-                elif isinstance(user, Individual):
-                    user_type = "individual"
-                elif user.is_staff:  # Assuming admin users are staff members
-                    user_type = "admin"
-                else:
-                    user_type = "unknown"
                 return Response(
                     {
                         "refresh": str(refresh),
                         "access": str(refresh.access_token),
                         "user_id": user.pk,
                         "email": user.email,
-                        "user_type": user_type,
+                        "user_type": user.user_type,
                     }
                 )
             else:

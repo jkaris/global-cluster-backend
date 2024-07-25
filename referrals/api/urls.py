@@ -32,7 +32,13 @@ urlpatterns = [
     ),
     path(
         "user-ranking/",
-        UserRankingViewSet.as_view({"get": "list"}),
+        UserRankingViewSet.as_view({"get": "list", "post": "create"}),
         name="user-ranking",
+    ),
+    path(
+        "user-ranking/<uuid:pk>/",
+        UserRankingViewSet.as_view(
+            {"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"}),
+        name="user-ranking-detail",
     ),
 ]

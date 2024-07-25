@@ -101,6 +101,7 @@ class SupportTicketViewSet(viewsets.ModelViewSet):
     queryset = SupportTicket.objects.all()
     serializer_class = SupportTicketSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
 
     def perform_create(self, serializer):
         serializer.save(submitted_by=self.request.user)

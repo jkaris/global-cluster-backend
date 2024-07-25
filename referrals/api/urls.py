@@ -21,7 +21,7 @@ urlpatterns = [
     path("products/<uuid:pk>/", ProductDetailAPIView.as_view(), name="product-detail"),
     path(
         "support-tickets/",
-        SupportTicketViewSet.as_view({"get": "list"}),
+        SupportTicketViewSet.as_view({"get": "list", "post": "create"}),
         name="support-ticket-list",
     ),
     path(

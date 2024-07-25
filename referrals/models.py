@@ -164,6 +164,8 @@ class SupportTicket(models.Model):
     ]
     priority = models.CharField(max_length=15, choices=PRIORITY_CHOICES, default="low")
     attachments = models.FileField(
+        blank=True,
+        null=True,
         upload_to="support_ticket_attachments/",
         validators=[
             FileExtensionValidator(

@@ -25,6 +25,12 @@ urlpatterns = [
         name="support-ticket-list",
     ),
     path(
+        "support-tickets/<uuid:pk>/",
+        SupportTicketViewSet.as_view(
+            {"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"}),
+        name="support-ticket-detail",
+    ),
+    path(
         "user-ranking/",
         UserRankingViewSet.as_view({"get": "list"}),
         name="user-ranking",

@@ -13,6 +13,7 @@ from .serializers import (
     UserRankingSerializer,
 )
 from django.shortcuts import get_object_or_404
+import requests
 
 
 class LoginView(APIView):
@@ -101,6 +102,7 @@ class SupportTicketViewSet(viewsets.ModelViewSet):
     # queryset = SupportTicket.objects.all()
     serializer_class = SupportTicketSerializer
     permission_classes = [permissions.IsAuthenticated]
+
     # http_method_names = ['get', 'post', 'put', 'patch', 'delete']
 
     def perform_create(self, serializer):
@@ -118,3 +120,42 @@ class SupportTicketViewSet(viewsets.ModelViewSet):
 class UserRankingViewSet(viewsets.ModelViewSet):
     queryset = UserRanking.objects.all()
     serializer_class = UserRankingSerializer
+
+
+class VerifyAccountView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        account_number = request.query_params.get('account_number')
+        bank_code = request.query_params.get('bank_code')
+
+        if not account_number or not bank_code:
+            return Response({"error": "Both account_number and bank_code are required"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Replace with your actual Bearer token and API URL
+        headers = {
+            'Authorization': 'Bearer Your_Bearer_Token',
+        }
+
+        params = {
+            'account_number': account_number,
+            'bank_code': bank_code,
+        }
+
+        try:
+            response = requests.get('http://nubapi.test/api/verify', headers=headers, params=params)
+            response.raise_for_status()  # Raises an HTTPError for bad responses
+            data = response.json()
+
+            return Response({
+                "account_name": data['account_name'],
+                "first_name": data['first_name'],
+                "last_name": data['last_name'],
+                "other_name": data['other_name'],
+                "account_number": data['account_number'],
+                "bank_code": data['bank_code'],
+                "bank_name": data['Bank_name']
+            })
+        except requests.RequestException as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

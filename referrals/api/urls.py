@@ -7,6 +7,7 @@ from .views import (
     ProductListCreateAPIView,
     SupportTicketViewSet,
     UserRankingViewSet,
+    VerifyAccountView,
 )
 
 urlpatterns = [
@@ -41,4 +42,5 @@ urlpatterns = [
             {"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"}),
         name="user-ranking-detail",
     ),
+    path('verify/', VerifyAccountView.as_view(), name='verify-account'),
 ]

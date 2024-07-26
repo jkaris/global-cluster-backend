@@ -102,6 +102,8 @@ class Product(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     description = models.TextField()
     product_image = models.ImageField(
+        blank=True,
+        null=True,
         upload_to="product_images/",
         validators=[
             FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "tiff"]),

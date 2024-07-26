@@ -1,4 +1,3 @@
-from django.conf import settings
 from rest_framework import serializers
 from ..models import Company, Individual, Product, SupportTicket, UserRanking, CustomUser, UserRegistration, \
     BusinessRegistration
@@ -57,6 +56,15 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     user_type = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    company_details = CompanySerializer(source='company', read_only=True)
+    individual_details = IndividualSerializer(source='individual', read_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'email', 'user_type', 'company_details', 'individual_details']
 
 
 class ProductSerializer(serializers.ModelSerializer):

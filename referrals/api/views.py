@@ -11,7 +11,7 @@ from .serializers import (
     ProductSerializer,
     SupportTicketSerializer,
     UserRankingSerializer,
-    UserRegistrationSerializer, BusinessRegistrationSerializer
+    UserRegistrationSerializer, BusinessRegistrationSerializer, UserDetailSerializer
 )
 from django.shortcuts import get_object_or_404
 import requests
@@ -26,36 +26,12 @@ class LoginView(APIView):
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 refresh = RefreshToken.for_user(user)
+                user_serializer = UserDetailSerializer(user)
                 response_data = {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
-                    "user_id": user.pk,
-                    "email": user.email,
-                    "user_type": user.user_type,
+                    "user": user_serializer.data
                 }
-
-                if user.user_type == 'individual':
-                    individual_data = {
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "address": user.address,
-                        "country": user.country,
-                        "state": user.state,
-                        "city": user.city,
-                        "phone_no": user.phone_no,
-                    }
-                    response_data.update(individual_data)
-                elif user.user_type == 'company':
-                    company_data = {
-                        "company_name": user.company_name,
-                        "company_address": user.company_address,
-                        "company_country": user.company_country,
-                        "company_state": user.company_state,
-                        "company_city": user.company_city,
-                        "company_phone_no": user.company_phone_no,
-                    }
-                    response_data.update(company_data)
-
                 return Response(response_data)
             else:
                 return Response(

@@ -8,6 +8,8 @@ from .views import (
     SupportTicketViewSet,
     UserRankingViewSet,
     VerifyAccountView,
+    UserRegistrationView,
+    BusinessRegistrationView,
 )
 
 urlpatterns = [
@@ -17,6 +19,8 @@ urlpatterns = [
         IndividualCreateView.as_view(),
         name="register_individual",
     ),
+    path("register/user/", UserRegistrationView.as_view(), name="register_user"),
+    path("register/business/", BusinessRegistrationView.as_view(), name="register_business"),
     path("login/", LoginView.as_view(), name="login"),
     path("products/", ProductListCreateAPIView.as_view(), name="product-list-create"),
     path("products/<uuid:pk>/", ProductDetailAPIView.as_view(), name="product-detail"),

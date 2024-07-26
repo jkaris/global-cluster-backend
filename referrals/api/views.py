@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from ..models import Company, Individual, Product, SupportTicket, UserRanking
+from ..models import Company, Individual, Product, SupportTicket, UserRanking, UserRegistration, BusinessRegistration
 from .serializers import (
     CompanySerializer,
     IndividualSerializer,
@@ -11,6 +11,7 @@ from .serializers import (
     ProductSerializer,
     SupportTicketSerializer,
     UserRankingSerializer,
+    UserRegistrationSerializer, BusinessRegistrationSerializer
 )
 from django.shortcuts import get_object_or_404
 import requests
@@ -18,18 +19,6 @@ import requests
 
 class LoginView(APIView):
     def post(self, request, *args, **kwargs):
-        """
-        Handle the POST request for the login API.
-        Parameters:
-            request (HttpRequest): The HTTP request object.
-            args (tuple): Additional positional arguments.
-            kwargs (dict): Additional keyword arguments.
-        Returns:
-        Response:
-            The HTTP response object.
-        Raises:
-            None.
-        """
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
@@ -37,15 +26,37 @@ class LoginView(APIView):
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 refresh = RefreshToken.for_user(user)
-                return Response(
-                    {
-                        "refresh": str(refresh),
-                        "access": str(refresh.access_token),
-                        "user_id": user.pk,
-                        "email": user.email,
-                        "user_type": user.user_type,
+                response_data = {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                    "user_id": user.pk,
+                    "email": user.email,
+                    "user_type": user.user_type,
+                }
+
+                if user.user_type == 'individual':
+                    individual_data = {
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "address": user.address,
+                        "country": user.country,
+                        "state": user.state,
+                        "city": user.city,
+                        "phone_no": user.phone_no,
                     }
-                )
+                    response_data.update(individual_data)
+                elif user.user_type == 'company':
+                    company_data = {
+                        "company_name": user.company_name,
+                        "company_address": user.company_address,
+                        "company_country": user.company_country,
+                        "company_state": user.company_state,
+                        "company_city": user.company_city,
+                        "company_phone_no": user.company_phone_no,
+                    }
+                    response_data.update(company_data)
+
+                return Response(response_data)
             else:
                 return Response(
                     {"detail": "Invalid credentials"},
@@ -159,3 +170,35 @@ class VerifyAccountView(APIView):
             })
         except requests.RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UserRegistrationView(generics.CreateAPIView):
+    queryset = UserRegistration.objects.all()
+    serializer_class = UserRegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            {"message": "User registered successfully. Awaiting approval."},
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
+
+
+class BusinessRegistrationView(generics.CreateAPIView):
+    queryset = BusinessRegistration.objects.all()
+    serializer_class = BusinessRegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            {"message": "Business registered successfully. Awaiting approval."},
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )

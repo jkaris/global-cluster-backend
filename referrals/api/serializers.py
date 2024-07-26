@@ -1,5 +1,7 @@
+from django.conf import settings
 from rest_framework import serializers
-from ..models import Company, Individual, Product, SupportTicket, UserRanking
+from ..models import Company, Individual, Product, SupportTicket, UserRanking, CustomUser, UserRegistration, \
+    BusinessRegistration
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -44,7 +46,7 @@ class IndividualSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        validated_data["user_type"] = "company"
+        validated_data["user_type"] = "individual"
         user = Individual(**validated_data)
         user.set_password(validated_data["password"])
         user.save()
@@ -87,3 +89,43 @@ class UserRankingSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRanking
         fields = "__all__"
+
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+    user_type = serializers.ChoiceField(choices=['individual'], write_only=True)
+
+    class Meta:
+        model = UserRegistration
+        fields = ['email', 'password', 'full_name', 'sponsor', 'user_type']
+        extra_kwargs = {'sponsor': {'required': False}}
+
+    def create(self, validated_data):
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
+        user_type = validated_data.pop('user_type')
+
+        user = CustomUser.objects.create_user(email=email, password=password, user_type=user_type, sponsor=sponsor)
+        user_registration = UserRegistration.objects.create(user=user, **validated_data)
+        return user_registration
+
+
+class BusinessRegistrationSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+    user_type = serializers.ChoiceField(choices=['company'], write_only=True)
+
+    class Meta:
+        model = BusinessRegistration
+        fields = ['email', 'password', 'company_name', 'user_type']
+        extra_kwargs = {'company_name': {'required': False}}
+
+    def create(self, validated_data):
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
+        user_type = validated_data.pop('user_type')
+
+        user = CustomUser.objects.create_user(email=email, password=password, user_type=user_type)
+        business_registration = BusinessRegistration.objects.create(user=user, **validated_data)
+        return business_registration

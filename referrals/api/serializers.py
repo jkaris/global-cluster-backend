@@ -74,11 +74,37 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    images = ProductImageSerializer(many=True, read_only=True)
+    images = ProductImageSerializer(many=True)
 
     class Meta:
         model = Product
         fields = "__all__"
+
+    def create(self, validated_data):
+        images_data = validated_data.pop('images')
+        product = Product.objects.create(**validated_data)
+        for image_data in images_data:
+            ProductImage.objects.create(product=product, **image_data)
+        return product
+
+    def update(self, instance, validated_data):
+        images_data = validated_data.pop('images')
+        instance.product_name = validated_data.get('product_name', instance.product_name)
+        instance.company = validated_data.get('company', instance.company)
+        instance.description = validated_data.get('description', instance.description)
+        instance.product_value = validated_data.get('product_value', instance.product_value)
+        instance.product_link = validated_data.get('product_link', instance.product_link)
+        instance.status = validated_data.get('status', instance.status)
+        instance.shares = validated_data.get('shares', instance.shares)
+        instance.traffic = validated_data.get('traffic', instance.traffic)
+        instance.save()
+
+        # Handle image updates
+        instance.images.all().delete()
+        for image_data in images_data:
+            ProductImage.objects.create(product=instance, **image_data)
+
+        return instance
 
 
 class SupportTicketSerializer(serializers.ModelSerializer):

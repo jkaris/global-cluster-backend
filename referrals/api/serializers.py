@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import Company, Individual, Product, SupportTicket, UserRanking, CustomUser, UserRegistration, \
-    BusinessRegistration
+    BusinessRegistration, ProductImage
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -67,7 +67,15 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'user_type', 'company_details', 'individual_details']
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image']
+
+
 class ProductSerializer(serializers.ModelSerializer):
+    images = ProductImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product
         fields = "__all__"

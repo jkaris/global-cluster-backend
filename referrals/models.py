@@ -101,15 +101,15 @@ class Product(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     description = models.TextField()
-    product_image = models.ImageField(
-        blank=True,
-        null=True,
-        upload_to="product_images/",
-        validators=[
-            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "tiff"]),
-            validate_file_size,
-        ],
-    )
+    # product_image = models.ImageField(
+    #     blank=True,
+    #     null=True,
+    #     upload_to="product_images/",
+    #     validators=[
+    #         FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "tiff"]),
+    #         validate_file_size,
+    #     ],
+    # )
     product_value = models.CharField(
         max_length=10, choices=[("whatsapp", "Whatsapp"), ("phone", "Phone"), ("website", "Website")], default="website"
     )
@@ -133,6 +133,22 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(
+        upload_to="product_images/",
+        validators=[
+            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "tiff"]),
+            validate_file_size,
+        ],
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return f"Image for {self.product.product_name}"
 
 
 class SupportTicket(models.Model):

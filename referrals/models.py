@@ -110,6 +110,9 @@ class Product(models.Model):
             validate_file_size,
         ],
     )
+    product_value = models.CharField(
+        max_length=10, choices=[("whatsapp", "Whatsapp"), ("phone", "Phone"), ("website", "Website")], default="website"
+    )
     product_link = models.CharField(max_length=255)
     STATUS_CHOICES = [
         ("pending", "Pending"),

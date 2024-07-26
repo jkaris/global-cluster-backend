@@ -210,3 +210,45 @@ class UserRanking(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserRegistration(models.Model):
+    STATUS_CHOICES = [
+        ('approve', 'Approve'),
+        ('pending', 'Pending'),
+        ('decline', 'Decline'),
+    ]
+
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='registration')
+    full_name = models.CharField(max_length=255)  # This will store first+last names
+    sponsor = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.full_name} - {self.status}"
+
+    class Meta:
+        verbose_name = "User Registration"
+        verbose_name_plural = "User Registrations"
+
+
+class BusinessRegistration(models.Model):
+    STATUS_CHOICES = [
+        ('approve', 'Approve'),
+        ('pending', 'Pending'),
+        ('decline', 'Decline'),
+    ]
+    company_name = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='company_registration')
+    registration_no = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='registration_number')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.company_name} - {self.status}"
+
+    class Meta:
+        verbose_name = "Business Registration"
+        verbose_name_plural = "Business Registrations"

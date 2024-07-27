@@ -86,6 +86,10 @@ class SupportTicket(models.Model):
         ],
     )
 
+    class Meta:
+        verbose_name = "Support Ticket"
+        verbose_name_plural = "Support Tickets"
+
     def __str__(self):
         """
         Returns a string representation of the object.

@@ -103,7 +103,12 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        user_data = validated_data.pop("user")
+        user_data = {
+            "email": validated_data.pop("email"),
+            "password": validated_data.pop("password"),
+            "user_type": validated_data.pop("user_type"),
+            "is_active": validated_data.pop("is_active"),
+        }
         user = CustomUser.objects.create_user(**user_data)
         company_profile = CompanyProfile.objects.create(user=user, **validated_data)
         return company_profile

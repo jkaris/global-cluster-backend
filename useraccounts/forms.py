@@ -4,12 +4,14 @@ from .models import CustomUser, IndividualProfile, CompanyProfile
 
 
 class UserCreationForm(forms.ModelForm):
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
+    password2 = forms.CharField(
+        label="Password confirmation", widget=forms.PasswordInput
+    )
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'name', 'user_type', 'profile_picture')
+        fields = ("email", "name", "user_type", "profile_picture")
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -31,7 +33,15 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'password', 'name', 'user_type', 'profile_picture', 'is_active', 'is_staff')
+        fields = (
+            "email",
+            "password",
+            "name",
+            "user_type",
+            "profile_picture",
+            "is_active",
+            "is_staff",
+        )
 
     def clean_password(self):
         return self.initial["password"]

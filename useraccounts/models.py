@@ -70,7 +70,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             ("admin", "Admin"),
         ],
     )
-    profile_picture = models.ImageField(upload_to="profile_pictures/", null=True, blank=True)
+    profile_picture = models.ImageField(
+        upload_to="profile_pictures/", null=True, blank=True
+    )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -92,7 +94,9 @@ class IndividualProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')])
+    gender = models.CharField(
+        max_length=10, choices=[("male", "Male"), ("female", "Female")]
+    )
     phone_number = models.CharField(max_length=15)
     address = models.CharField(max_length=255)
     country = models.CharField(max_length=50)
@@ -100,7 +104,7 @@ class IndividualProfile(models.Model):
     city = models.CharField(max_length=50)
 
     class Meta:
-        unique_together = ('first_name', 'last_name')
+        unique_together = ("first_name", "last_name")
         verbose_name = "Individual Profile"
         verbose_name_plural = "Individual Profiles"
 

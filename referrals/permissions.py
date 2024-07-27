@@ -13,6 +13,8 @@ class IsCompanyOrAdmin(BasePermission):
         Returns:
             bool: True if the user is authenticated and has a user type of 'company' or 'admin', False otherwise.
         """
-        return request.user and request.user.is_authenticated and request.user.user_type in ['company', 'admin']
-
-
+        return (
+            request.user
+            and request.user.is_authenticated
+            and request.user.user_type in ["company", "admin"]
+        )

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Product, SupportTicket
+from .models import Product, SupportTicket, UserRanking
 
 
 @admin.register(Product)
@@ -8,6 +8,7 @@ class ProductAdmin(admin.ModelAdmin):
     """
     Admin class for the Product model.
     """
+
     list_display = ["product_name", "company", "date_created", "date_updated"]
     list_filter = ["company"]
 
@@ -17,5 +18,16 @@ class SupportTicketAdmin(admin.ModelAdmin):
     """
     Admin class for the SupportTicket model.
     """
+
     list_display = ["title", "submitted_by", "date_created", "date_updated"]
     list_filter = ["support", "status", "priority"]
+
+
+@admin.register(UserRanking)
+class UserRankingAdmin(admin.ModelAdmin):
+    """
+    Admin class for the UserRanking model.
+    """
+
+    list_display = ["rank_level", "status", "name", "total_recruits", "bonus"]
+    list_filter = ["name"]

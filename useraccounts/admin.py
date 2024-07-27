@@ -8,23 +8,34 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
-    list_display = ('email', 'name', 'user_type', 'is_staff', 'is_active')
-    list_filter = ('user_type', 'is_staff', 'is_active')
+    list_display = ("email", "name", "user_type", "is_staff", "is_active")
+    list_filter = ("user_type", "is_staff", "is_active")
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('name', 'user_type', 'profile_picture')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        (None, {"fields": ("email", "password")}),
+        ("Personal Info", {"fields": ("name", "user_type", "profile_picture")}),
+        ("Permissions", {"fields": ("is_staff", "is_active", "is_superuser")}),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': (
-                'email', 'name', 'user_type', 'profile_picture', 'password1', 'password2', 'is_staff', 'is_active')}
-         ),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "name",
+                    "user_type",
+                    "profile_picture",
+                    "password1",
+                    "password2",
+                    "is_staff",
+                    "is_active",
+                ),
+            },
+        ),
     )
-    search_fields = ('email',)
-    ordering = ('email',)
+    search_fields = ("email",)
+    ordering = ("email",)
 
 
 admin.site.register(CustomUser, UserAdmin)
@@ -32,9 +43,25 @@ admin.site.register(CustomUser, UserAdmin)
 
 @admin.register(CompanyProfile)
 class CompanyProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'company_name', 'company_registration_number', 'phone_number', 'address', 'country')
+    list_display = (
+        "user",
+        "company_name",
+        "company_registration_number",
+        "phone_number",
+        "address",
+        "country",
+    )
 
 
 @admin.register(IndividualProfile)
 class IndividualProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'first_name', 'last_name', 'phone_number', 'address', 'country', 'state', 'city')
+    list_display = (
+        "user",
+        "first_name",
+        "last_name",
+        "phone_number",
+        "address",
+        "country",
+        "state",
+        "city",
+    )

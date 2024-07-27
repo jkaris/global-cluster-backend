@@ -76,6 +76,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+
     def __str__(self):
         return self.email
 
@@ -91,6 +95,11 @@ class IndividualProfile(models.Model):
     state = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
 
+    class Meta:
+        unique_together = ('first_name', 'last_name')
+        verbose_name = "Individual Profile"
+        verbose_name_plural = "Individual Profiles"
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -102,6 +111,10 @@ class CompanyProfile(models.Model):
     phone_number = models.CharField(max_length=15)
     address = models.CharField(max_length=255)
     country = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = "Company Profile"
+        verbose_name_plural = "Company Profiles"
 
     def __str__(self):
         return self.company_name

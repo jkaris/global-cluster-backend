@@ -9,7 +9,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
-        read_only_fields = ('company',)  # Make company read-only in the serializer
+        read_only_fields = ('company',)
 
     def validate(self, data):
         """
@@ -43,23 +43,14 @@ class SupportTicketSerializer(serializers.ModelSerializer):
     """
     Serializer for the SupportTicket model.
     """
-
     class Meta:
         model = SupportTicket
         fields = "__all__"
+        read_only_fields = ('submitted_by',)  # Make submitted_by read-only in the serializer
 
     def validate(self, data):
         """
-        Validates the given data for creating a support ticket.
-
-        Args:
-            data (dict): The data to be validated.
-
-        Returns:
-            dict: The validated data.
-
-        Raises:
-            serializers.ValidationError: If the user is not an individual or a company.
+        Validates the data provided in the request.
         """
         request = self.context.get("request")
         if request and hasattr(request, "user"):
@@ -68,7 +59,16 @@ class SupportTicketSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Only individuals or companies can create support tickets."
                 )
+            # Set the submitted_by field here, before validation
+            data['submitted_by'] = user
         return data
+
+    def create(self, validated_data):
+        """
+        Create and return a new `SupportTicket` instance, given the validated data.
+        """
+        # The submitted_by should already be in validated_data from the validate method
+        return super().create(validated_data)
 
 
 class UserRankingSerializer(serializers.ModelSerializer):

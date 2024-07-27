@@ -81,24 +81,15 @@ class SupportTicketViewSet(viewsets.ModelViewSet):
     serializer_class = SupportTicketSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
+    def get_queryset(self):
         """
-        Save a new support ticket instance using the provided serializer.
-
-        Args:
-            serializer (Serializer): The serializer instance containing the support ticket data.
-
-        Raises:
-            PermissionDenied: If the user is not an individual or a company.
-
-        Returns:
-            None
+        This view should return a list of all the support tickets
+        for the currently authenticated user.
         """
-        if self.request.user.user_type not in ["individual", "company"]:
-            raise PermissionDenied(
-                "You do not have permission to create a support ticket."
-            )
-        serializer.save(submitted_by=self.request.user)
+        user = self.request.user
+        if user.is_staff:
+            return SupportTicket.objects.all()
+        return SupportTicket.objects.filter(submitted_by=user)
 
 
 class UserRankingViewSet(viewsets.ModelViewSet):

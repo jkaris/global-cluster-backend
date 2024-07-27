@@ -12,7 +12,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ("user_type", "is_staff", "is_active")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Personal Info", {"fields": ("name", "user_type", "profile_picture")}),
+        ("Personal Info", {"fields": ("name", "user_type", "profile_picture", "status")}),
         ("Permissions", {"fields": ("is_staff", "is_active", "is_superuser")}),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )

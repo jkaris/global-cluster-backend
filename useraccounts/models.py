@@ -102,6 +102,15 @@ class IndividualProfile(models.Model):
     country = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
+    date_joined = models.DateField(auto_now_add=True)
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("declined", "Declined"),
+    ]
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="pending"
+    )
 
     class Meta:
         unique_together = ("first_name", "last_name")
@@ -119,6 +128,13 @@ class CompanyProfile(models.Model):
     phone_number = models.CharField(max_length=15)
     address = models.CharField(max_length=255)
     country = models.CharField(max_length=50)
+    date_joined = models.DateField(auto_now_add=True)
+    STATUS_CHOICES = [
+        ("active", "Active"), ("pending", "Pending"),
+    ]
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="pending"
+    )
 
     class Meta:
         verbose_name = "Company Profile"

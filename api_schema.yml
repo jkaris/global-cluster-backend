@@ -310,20 +310,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/CustomUserTokenObtainPair'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/CustomUserTokenObtainPair'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/TokenObtainPair'
+              $ref: '#/components/schemas/CustomUserTokenObtainPair'
         required: true
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenObtainPair'
+                $ref: '#/components/schemas/CustomUserTokenObtainPair'
           description: ''
   /api/v1/accounts/token/refresh/:
     post:
@@ -689,7 +689,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/UserRanking'
-        required: true
       security:
       - jwtAuth: []
       responses:
@@ -744,7 +743,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/UserRanking'
-        required: true
       security:
       - jwtAuth: []
       responses:
@@ -824,6 +822,9 @@ components:
     CompanyProfile:
       type: object
       properties:
+        pk:
+          type: integer
+          title: User
         company_name:
           type: string
           maxLength: 100
@@ -839,42 +840,46 @@ components:
         country:
           type: string
           maxLength: 50
-        user:
-          $ref: '#/components/schemas/CustomUser'
+        user_type:
+          type: string
+          writeOnly: true
+        email:
+          type: string
+          format: email
+          writeOnly: true
+        status:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        is_active:
+          type: boolean
+          writeOnly: true
+          default: true
       required:
       - address
       - company_name
       - company_registration_number
       - country
+      - email
+      - password
       - phone_number
-      - user
-    CustomUser:
+      - pk
+      - status
+      - user_type
+    CustomUserTokenObtainPair:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         email:
           type: string
-          format: email
-          maxLength: 254
-        name:
-          type: string
-          maxLength: 100
-        user_type:
-          $ref: '#/components/schemas/UserTypeEnum'
+          writeOnly: true
         password:
           type: string
           writeOnly: true
-        profile_picture:
-          type: string
-          format: uri
-          nullable: true
       required:
       - email
-      - id
-      - name
-      - user_type
+      - password
     GenderEnum:
       enum:
       - male
@@ -886,6 +891,9 @@ components:
     IndividualProfile:
       type: object
       properties:
+        pk:
+          type: integer
+          title: User
         first_name:
           type: string
           maxLength: 30
@@ -919,6 +927,8 @@ components:
         user_type:
           type: string
           writeOnly: true
+        status:
+          $ref: '#/components/schemas/IndividualProfileStatusEnum'
         is_active:
           type: boolean
           writeOnly: true
@@ -933,8 +943,19 @@ components:
       - last_name
       - password
       - phone_number
+      - pk
       - state
       - user_type
+    IndividualProfileStatusEnum:
+      enum:
+      - pending
+      - approved
+      - declined
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `declined` - Declined
     NameEnum:
       enum:
       - gold pro
@@ -952,6 +973,9 @@ components:
     PatchedCompanyProfile:
       type: object
       properties:
+        pk:
+          type: integer
+          title: User
         company_name:
           type: string
           maxLength: 100
@@ -967,11 +991,29 @@ components:
         country:
           type: string
           maxLength: 50
-        user:
-          $ref: '#/components/schemas/CustomUser'
+        user_type:
+          type: string
+          writeOnly: true
+        email:
+          type: string
+          format: email
+          writeOnly: true
+        status:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        is_active:
+          type: boolean
+          writeOnly: true
+          default: true
     PatchedIndividualProfile:
       type: object
       properties:
+        pk:
+          type: integer
+          title: User
         first_name:
           type: string
           maxLength: 30
@@ -1005,6 +1047,8 @@ components:
         user_type:
           type: string
           writeOnly: true
+        status:
+          $ref: '#/components/schemas/IndividualProfileStatusEnum'
         is_active:
           type: boolean
           writeOnly: true
@@ -1052,6 +1096,7 @@ components:
           minimum: 0
         company:
           type: integer
+          readOnly: true
     PatchedSupportTicket:
       type: object
       description: Serializer for the SupportTicket model.
@@ -1086,6 +1131,7 @@ components:
           pattern: (?:png|jpg|jpeg|tiff|pdf)$
         submitted_by:
           type: integer
+          readOnly: true
     PatchedUserRanking:
       type: object
       description: Serializer for the UserRanking model.
@@ -1096,8 +1142,10 @@ components:
         icon:
           type: string
           format: uri
+          nullable: true
         user:
           type: string
+          nullable: true
           maxLength: 255
         rank_level:
           type: integer
@@ -1175,6 +1223,7 @@ components:
           minimum: 0
         company:
           type: integer
+          readOnly: true
       required:
       - company
       - date_created
@@ -1245,6 +1294,7 @@ components:
           pattern: (?:png|jpg|jpeg|tiff|pdf)$
         submitted_by:
           type: integer
+          readOnly: true
       required:
       - date_created
       - date_updated
@@ -1260,26 +1310,6 @@ components:
       description: |-
         * `in-progress` - In Progress
         * `resolved` - Resolved
-    TokenObtainPair:
-      type: object
-      properties:
-        email:
-          type: string
-          writeOnly: true
-        password:
-          type: string
-          writeOnly: true
-        access:
-          type: string
-          readOnly: true
-        refresh:
-          type: string
-          readOnly: true
-      required:
-      - access
-      - email
-      - password
-      - refresh
     TokenRefresh:
       type: object
       properties:
@@ -1302,8 +1332,10 @@ components:
         icon:
           type: string
           format: uri
+          nullable: true
         user:
           type: string
+          nullable: true
           maxLength: 255
         rank_level:
           type: integer
@@ -1330,9 +1362,7 @@ components:
           readOnly: true
       required:
       - date
-      - icon
       - id
-      - user
     UserRankingStatusEnum:
       enum:
       - enabled
@@ -1341,16 +1371,6 @@ components:
       description: |-
         * `enabled` - Enabled
         * `disabled` - Disabled
-    UserTypeEnum:
-      enum:
-      - individual
-      - company
-      - admin
-      type: string
-      description: |-
-        * `individual` - Individual
-        * `company` - Company
-        * `admin` - Admin
     VerifyAccount:
       type: object
       description: Serializer for verifying an account.

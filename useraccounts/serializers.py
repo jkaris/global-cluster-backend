@@ -28,11 +28,14 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
     user_type = serializers.CharField(write_only=True)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
     is_active = serializers.BooleanField(default=True, write_only=True)
+    created_at = serializers.DateTimeField(source='user.date_joined', read_only=True)
 
     class Meta:
         model = IndividualProfile
         fields = [
+            "user_id",
             "first_name",
             "last_name",
             "gender",
@@ -44,7 +47,9 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "user_type",
+            "status",
             "is_active",
+            "created_at"
         ]
 
     def create(self, validated_data):
@@ -59,6 +64,11 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
             user=user, **validated_data
         )
         return individual_profile
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user_id'] = instance.user.id
+        return representation
 
     def update(self, instance, validated_data):
         user_data = {
@@ -87,10 +97,13 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     user_type = serializers.CharField(write_only=True)
     is_active = serializers.BooleanField(default=True, write_only=True)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)  # Add this line
+    created_at = serializers.DateTimeField(source='user.date_joined', read_only=True)
 
     class Meta:
         model = CompanyProfile
         fields = [
+            "user_id",
             "company_name",
             "company_registration_number",
             "phone_number",
@@ -100,6 +113,7 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "is_active",
+            "created_at",
         ]
 
     def create(self, validated_data):
@@ -113,8 +127,13 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         company_profile = CompanyProfile.objects.create(user=user, **validated_data)
         return company_profile
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user_id'] = instance.user.id
+        return representation
+
     def update(self, instance, validated_data):
-        user_data = validated_data.pop("user")
+        user_data = validated_data.pop("user", {})
         user = instance.user
 
         serializer = CustomUserSerializer(user, data=user_data, partial=True)

@@ -142,12 +142,23 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         return representation
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop("user", {})
+        user_data = {
+            "email": validated_data.pop("email", None),
+            "password": validated_data.pop("password", None),
+            "user_type": validated_data.pop("user_type", None),
+            "is_active": validated_data.pop("is_active", instance.user.is_active),
+        }
         user = instance.user
 
-        serializer = CustomUserSerializer(user, data=user_data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
+        if user_data["email"]:
+            user.email = user_data["email"]
+        if user_data["password"]:
+            user.set_password(user_data["password"])
+        if user_data["user_type"]:
+            user.user_type = user_data["user_type"]
+        user.is_active = user_data["is_active"]
+
+        user.save()
         instance = super().update(instance, validated_data)
         return instance
 

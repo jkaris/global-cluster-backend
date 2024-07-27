@@ -822,9 +822,9 @@ components:
     CompanyProfile:
       type: object
       properties:
-        pk:
+        user_id:
           type: integer
-          title: User
+          readOnly: true
         company_name:
           type: string
           maxLength: 100
@@ -847,9 +847,6 @@ components:
           type: string
           format: email
           writeOnly: true
-        status:
-          type: string
-          writeOnly: true
         password:
           type: string
           writeOnly: true
@@ -857,16 +854,20 @@ components:
           type: boolean
           writeOnly: true
           default: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
       required:
       - address
       - company_name
       - company_registration_number
       - country
+      - created_at
       - email
       - password
       - phone_number
-      - pk
-      - status
+      - user_id
       - user_type
     CustomUserTokenObtainPair:
       type: object
@@ -891,9 +892,9 @@ components:
     IndividualProfile:
       type: object
       properties:
-        pk:
+        user_id:
           type: integer
-          title: User
+          readOnly: true
         first_name:
           type: string
           maxLength: 30
@@ -933,18 +934,23 @@ components:
           type: boolean
           writeOnly: true
           default: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
       required:
       - address
       - city
       - country
+      - created_at
       - email
       - first_name
       - gender
       - last_name
       - password
       - phone_number
-      - pk
       - state
+      - user_id
       - user_type
     IndividualProfileStatusEnum:
       enum:
@@ -973,9 +979,9 @@ components:
     PatchedCompanyProfile:
       type: object
       properties:
-        pk:
+        user_id:
           type: integer
-          title: User
+          readOnly: true
         company_name:
           type: string
           maxLength: 100
@@ -998,9 +1004,6 @@ components:
           type: string
           format: email
           writeOnly: true
-        status:
-          type: string
-          writeOnly: true
         password:
           type: string
           writeOnly: true
@@ -1008,12 +1011,16 @@ components:
           type: boolean
           writeOnly: true
           default: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedIndividualProfile:
       type: object
       properties:
-        pk:
+        user_id:
           type: integer
-          title: User
+          readOnly: true
         first_name:
           type: string
           maxLength: 30
@@ -1053,6 +1060,10 @@ components:
           type: boolean
           writeOnly: true
           default: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedProduct:
       type: object
       description: Serializer for the Product model.

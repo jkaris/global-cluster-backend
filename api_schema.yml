@@ -909,18 +909,32 @@ components:
         city:
           type: string
           maxLength: 50
-        user:
-          $ref: '#/components/schemas/CustomUser'
+        email:
+          type: string
+          format: email
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        user_type:
+          type: string
+          writeOnly: true
+        is_active:
+          type: boolean
+          writeOnly: true
+          default: true
       required:
       - address
       - city
       - country
+      - email
       - first_name
       - gender
       - last_name
+      - password
       - phone_number
       - state
-      - user
+      - user_type
     NameEnum:
       enum:
       - gold pro
@@ -981,8 +995,20 @@ components:
         city:
           type: string
           maxLength: 50
-        user:
-          $ref: '#/components/schemas/CustomUser'
+        email:
+          type: string
+          format: email
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        user_type:
+          type: string
+          writeOnly: true
+        is_active:
+          type: boolean
+          writeOnly: true
+          default: true
     PatchedProduct:
       type: object
       description: Serializer for the Product model.

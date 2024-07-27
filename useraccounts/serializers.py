@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser, IndividualProfile, CompanyProfile
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -24,7 +25,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class IndividualProfileSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer()
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
+    user_type = serializers.CharField(write_only=True)
+    is_active = serializers.BooleanField(default=True, write_only=True)
 
     class Meta:
         model = IndividualProfile
@@ -37,11 +41,19 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
             "country",
             "state",
             "city",
-            "user",
+            "email",
+            "password",
+            "user_type",
+            "is_active",
         ]
 
     def create(self, validated_data):
-        user_data = validated_data.pop("user")
+        user_data = {
+            "email": validated_data.pop("email"),
+            "password": validated_data.pop("password"),
+            "user_type": validated_data.pop("user_type"),
+            "is_active": validated_data.pop("is_active"),
+        }
         user = CustomUser.objects.create_user(**user_data)
         individual_profile = IndividualProfile.objects.create(
             user=user, **validated_data
@@ -49,18 +61,32 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
         return individual_profile
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop("user")
+        user_data = {
+            "email": validated_data.pop("email", None),
+            "password": validated_data.pop("password", None),
+            "user_type": validated_data.pop("user_type", None),
+            "is_active": validated_data.pop("is_active", instance.user.is_active),
+        }
         user = instance.user
 
-        serializer = CustomUserSerializer(user, data=user_data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
+        if user_data["email"]:
+            user.email = user_data["email"]
+        if user_data["password"]:
+            user.set_password(user_data["password"])
+        if user_data["user_type"]:
+            user.user_type = user_data["user_type"]
+        user.is_active = user_data["is_active"]
+
+        user.save()
         instance = super().update(instance, validated_data)
         return instance
 
 
 class CompanyProfileSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer()
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
+    user_type = serializers.CharField(write_only=True)
+    is_active = serializers.BooleanField(default=True, write_only=True)
 
     class Meta:
         model = CompanyProfile
@@ -70,7 +96,10 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
             "phone_number",
             "address",
             "country",
-            "user",
+            "user_type",
+            "email",
+            "password",
+            "is_active",
         ]
 
     def create(self, validated_data):
@@ -88,3 +117,32 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
             serializer.save()
         instance = super().update(instance, validated_data)
         return instance
+
+
+class CustomUserTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        user = self.user
+        if user.user_type == 'individual':
+            profile_data = IndividualProfileSerializer(IndividualProfile.objects.get(user=user)).data
+        elif user.user_type == 'company':
+            profile_data = CompanyProfileSerializer(CompanyProfile.objects.get(user=user)).data
+        else:
+            profile_data = {}
+
+        data.update({
+            "refresh": data.get("refresh"),
+            "access": data.get("access"),
+            "user": {
+                "email": user.email,
+                "is_active": user.is_active,
+                "user_type": user.user_type,
+                "profile": {
+                    **profile_data
+                }
+            }
+        })
+
+        return data
+

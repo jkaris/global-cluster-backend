@@ -68,6 +68,11 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['user_id'] = instance.user.id
+        representation['status'] = instance.status
+        representation['is_active'] = instance.user.is_active
+        representation['created_at'] = instance.date_joined
+        representation['user_type'] = instance.user.user_type
+        representation['email'] = instance.user.email
         return representation
 
     def update(self, instance, validated_data):
@@ -130,6 +135,10 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['user_id'] = instance.user.id
+        representation['user_type'] = instance.user.user_type
+        representation['email'] = instance.user.email
+        representation['status'] = instance.status
+        representation['is_active'] = instance.user.is_active
         return representation
 
     def update(self, instance, validated_data):

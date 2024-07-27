@@ -146,9 +146,10 @@ class UserRanking(models.Model):
     """
 
     icon = models.ImageField(
-        upload_to="ranking_icons/", validators=[validate_file_size]
+        upload_to="ranking_icons/", validators=[validate_file_size],
+        blank=True, null=True
     )
-    user = models.CharField(max_length=255)
+    user = models.CharField(max_length=255, blank=True, null=True)
     rank_level = models.IntegerField(default=0)
     NAME_CHOICES = [
         ("gold pro", "Gold Pro"),

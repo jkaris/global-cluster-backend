@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "corsheaders",
     # Local
     "useraccounts.apps.UseraccountsConfig",
+    "referrals.apps.ReferralsConfig",
 ]
 
 MIDDLEWARE = [

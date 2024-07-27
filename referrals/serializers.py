@@ -6,24 +6,14 @@ class ProductSerializer(serializers.ModelSerializer):
     """
     Serializer for the Product model.
     """
-
     class Meta:
         model = Product
         fields = "__all__"
+        read_only_fields = ('company',)  # Make company read-only in the serializer
 
     def validate(self, data):
         """
         Validates the data provided in the request.
-
-        This function checks if the request has a user attribute and if the user's user_type is either 'company' or
-        'admin'. If not, it raises a serializers.ValidationError with the message "Only companies or admins can create
-        products."
-
-        Parameters:
-            data (dict): The data to be validated.
-
-        Returns:
-            dict: The validated data.
         """
         request = self.context.get("request")
         if request and hasattr(request, "user"):
@@ -32,7 +22,21 @@ class ProductSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Only companies or admins can create products."
                 )
+            # Set the company here, before validation
+            if user.user_type == "company":
+                data['company'] = user.companyprofile
+            elif user.user_type == "admin":
+                # For admin, you might want to require them to specify a company
+                if 'company' not in data:
+                    raise serializers.ValidationError("Admin must specify a company.")
         return data
+
+    def create(self, validated_data):
+        """
+        Create and return a new `Product` instance, given the validated data.
+        """
+        # The company should already be in validated_data from the validate method
+        return super().create(validated_data)
 
 
 class SupportTicketSerializer(serializers.ModelSerializer):

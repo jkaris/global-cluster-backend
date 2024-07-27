@@ -70,15 +70,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             ("admin", "Admin"),
         ],
     )
+    profile_picture = models.ImageField(upload_to="profile_pictures/", null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["name", "user_type"]
 
     class Meta:
-        verbose_name = "User"
-        verbose_name_plural = "Users"
+        verbose_name = "Custom User"
+        verbose_name_plural = "Custom Users"
 
     def __str__(self):
         return self.email

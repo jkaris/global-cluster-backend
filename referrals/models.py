@@ -6,6 +6,9 @@ from .validators import validate_file_size
 
 
 class Product(models.Model):
+    """
+    Product model.
+    """
     uuid = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product_name = models.CharField(max_length=255)
     company = models.ForeignKey(
@@ -177,4 +180,9 @@ class UserRanking(models.Model):
         verbose_name_plural = "User Rankings"
 
     def __str__(self):
+        """
+        Returns a string representation of the object.
+        :return: The title of the object.
+        :rtype: str
+        """
         return self.name

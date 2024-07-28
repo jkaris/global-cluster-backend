@@ -7,10 +7,20 @@ from .serializers import IndividualProfileSerializer, CompanyProfileSerializer, 
 
 
 class IndividualProfileViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
     queryset = IndividualProfile.objects.all()
     serializer_class = IndividualProfileSerializer
 
     def create(self, request, *args, **kwargs):
+        """
+        Create and return a new `IndividualProfile` instance, given the validated data.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -27,10 +37,20 @@ class IndividualProfileViewSet(viewsets.ModelViewSet):
 
 
 class CompanyProfileViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
     queryset = CompanyProfile.objects.all()
     serializer_class = CompanyProfileSerializer
 
     def create(self, request, *args, **kwargs):
+        """
+        Create and return a new `CompanyProfile` instance, given the validated data.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -47,4 +67,7 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    Custom TokenObtainPairView
+    """
     serializer_class = CustomUserTokenObtainPairSerializer

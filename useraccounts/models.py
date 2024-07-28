@@ -58,6 +58,9 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    """
+    Custom user model with email as the unique identifier.
+    """
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
@@ -75,6 +78,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
 
     def save(self, *args, **kwargs):
+        """
+        Save the object to the database.
+        :param args:
+        :param kwargs:
+        :return:
+        """
         super().save(*args, **kwargs)
 
     objects = CustomUserManager()
@@ -83,14 +92,24 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ["name", "user_type"]
 
     class Meta:
+        """
+        Meta class for the CustomUser model.
+        """
         verbose_name = "Custom User"
         verbose_name_plural = "Custom Users"
 
     def __str__(self):
+        """
+        Returns a string representation of the object.
+        :return: The email of the object.
+        """
         return self.email
 
 
 class IndividualProfile(models.Model):
+    """
+    Individual profile model.
+    """
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -113,15 +132,25 @@ class IndividualProfile(models.Model):
     )
 
     class Meta:
+        """
+        Meta class for the IndividualProfile model.
+        """
         unique_together = ("first_name", "last_name")
         verbose_name = "Individual Profile"
         verbose_name_plural = "Individual Profiles"
 
     def __str__(self):
+        """
+        Returns a string representation of the object.
+        :return:
+        """
         return f"{self.first_name} {self.last_name}"
 
 
 class CompanyProfile(models.Model):
+    """
+    Company profile model.
+    """
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     company_name = models.CharField(max_length=100)
     company_registration_number = models.CharField(max_length=50)
@@ -137,8 +166,15 @@ class CompanyProfile(models.Model):
     )
 
     class Meta:
+        """
+        Meta class for the CompanyProfile model.
+        """
         verbose_name = "Company Profile"
         verbose_name_plural = "Company Profiles"
 
     def __str__(self):
+        """
+        Returns a string representation of the object.
+        :return:
+        """
         return self.company_name

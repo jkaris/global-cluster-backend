@@ -5,6 +5,9 @@ from .forms import UserCreationForm, UserChangeForm
 
 
 class UserAdmin(BaseUserAdmin):
+    """
+    Define admin model for custom User model with no email field
+    """
     form = UserChangeForm
     add_form = UserCreationForm
 
@@ -43,6 +46,9 @@ admin.site.register(CustomUser, UserAdmin)
 
 @admin.register(CompanyProfile)
 class CompanyProfileAdmin(admin.ModelAdmin):
+    """
+    Admin class for the CompanyProfile model.
+    """
     list_display = (
         "user",
         "company_name",
@@ -55,6 +61,9 @@ class CompanyProfileAdmin(admin.ModelAdmin):
 
 @admin.register(IndividualProfile)
 class IndividualProfileAdmin(admin.ModelAdmin):
+    """
+    Admin class for the IndividualProfile model.
+    """
     list_display = (
         "user",
         "first_name",

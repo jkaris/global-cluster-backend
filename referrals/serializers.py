@@ -7,6 +7,9 @@ class ProductSerializer(serializers.ModelSerializer):
     Serializer for the Product model.
     """
     class Meta:
+        """
+        Meta class for the Product model.
+        """
         model = Product
         fields = "__all__"
         read_only_fields = ('company',)
@@ -44,6 +47,9 @@ class SupportTicketSerializer(serializers.ModelSerializer):
     Serializer for the SupportTicket model.
     """
     class Meta:
+        """
+        Meta class for the SupportTicket model.
+        """
         model = SupportTicket
         fields = "__all__"
         read_only_fields = ('submitted_by',)  # Make submitted_by read-only in the serializer

@@ -7,6 +7,7 @@ paths:
   /api/v1/accounts/companies/:
     get:
       operationId: accounts_companies_list
+      description: API endpoint that allows users to be viewed or edited.
       tags:
       - accounts
       security:
@@ -23,6 +24,12 @@ paths:
           description: ''
     post:
       operationId: accounts_companies_create
+      description: |-
+        Create and return a new `CompanyProfile` instance, given the validated data.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
       tags:
       - accounts
       requestBody:
@@ -50,6 +57,7 @@ paths:
   /api/v1/accounts/companies/{user}/:
     get:
       operationId: accounts_companies_retrieve
+      description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
         name: user
@@ -71,6 +79,7 @@ paths:
           description: ''
     put:
       operationId: accounts_companies_update
+      description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
         name: user
@@ -104,6 +113,7 @@ paths:
           description: ''
     patch:
       operationId: accounts_companies_partial_update
+      description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
         name: user
@@ -136,6 +146,7 @@ paths:
           description: ''
     delete:
       operationId: accounts_companies_destroy
+      description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
         name: user
@@ -154,6 +165,7 @@ paths:
   /api/v1/accounts/individuals/:
     get:
       operationId: accounts_individuals_list
+      description: API endpoint that allows users to be viewed or edited.
       tags:
       - accounts
       security:
@@ -170,6 +182,12 @@ paths:
           description: ''
     post:
       operationId: accounts_individuals_create
+      description: |-
+        Create and return a new `IndividualProfile` instance, given the validated data.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
       tags:
       - accounts
       requestBody:
@@ -197,6 +215,7 @@ paths:
   /api/v1/accounts/individuals/{user}/:
     get:
       operationId: accounts_individuals_retrieve
+      description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
         name: user
@@ -218,6 +237,7 @@ paths:
           description: ''
     put:
       operationId: accounts_individuals_update
+      description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
         name: user
@@ -251,6 +271,7 @@ paths:
           description: ''
     patch:
       operationId: accounts_individuals_partial_update
+      description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
         name: user
@@ -283,6 +304,7 @@ paths:
           description: ''
     delete:
       operationId: accounts_individuals_destroy
+      description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
         name: user
@@ -301,9 +323,7 @@ paths:
   /api/v1/accounts/token/:
     post:
       operationId: accounts_token_create
-      description: |-
-        Takes a set of user credentials and returns an access and refresh JSON web
-        token pair to prove the authentication of those credentials.
+      description: Custom TokenObtainPairView
       tags:
       - accounts
       requestBody:
@@ -821,6 +841,7 @@ components:
   schemas:
     CompanyProfile:
       type: object
+      description: Serializer for CompanyProfile
       properties:
         user_id:
           type: integer
@@ -871,6 +892,7 @@ components:
       - user_type
     CustomUserTokenObtainPair:
       type: object
+      description: Serializer for CustomUserTokenObtainPair
       properties:
         email:
           type: string
@@ -891,6 +913,7 @@ components:
         * `female` - Female
     IndividualProfile:
       type: object
+      description: Serializer for IndividualProfile
       properties:
         user_id:
           type: integer
@@ -978,6 +1001,7 @@ components:
         * `platinum` - Platinum
     PatchedCompanyProfile:
       type: object
+      description: Serializer for CompanyProfile
       properties:
         user_id:
           type: integer
@@ -1017,6 +1041,7 @@ components:
           readOnly: true
     PatchedIndividualProfile:
       type: object
+      description: Serializer for IndividualProfile
       properties:
         user_id:
           type: integer

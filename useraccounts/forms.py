@@ -8,6 +8,7 @@ class UserCreationForm(forms.ModelForm):
     A form that creates a user, with no privileges, from the given email and
     password.
     """
+
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(
         label="Password confirmation", widget=forms.PasswordInput
@@ -17,6 +18,7 @@ class UserCreationForm(forms.ModelForm):
         """
         Meta class for UserCreationForm
         """
+
         model = CustomUser
         fields = ("email", "name", "user_type", "profile_picture")
 
@@ -50,12 +52,14 @@ class UserChangeForm(forms.ModelForm):
     the user, but replaces the password field with admin's
     password hash display field.
     """
+
     password = ReadOnlyPasswordHashField()
 
     class Meta:
         """
         Meta class for UserChangeForm
         """
+
         model = CustomUser
         fields = (
             "email",

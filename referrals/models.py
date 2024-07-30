@@ -9,6 +9,7 @@ class Product(models.Model):
     """
     Product model.
     """
+
     uuid = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product_name = models.CharField(max_length=255)
     company = models.ForeignKey(
@@ -149,8 +150,10 @@ class UserRanking(models.Model):
     """
 
     icon = models.ImageField(
-        upload_to="ranking_icons/", validators=[validate_file_size],
-        blank=True, null=True
+        upload_to="ranking_icons/",
+        validators=[validate_file_size],
+        blank=True,
+        null=True,
     )
     user = models.CharField(max_length=255, blank=True, null=True)
     rank_level = models.IntegerField(default=0)

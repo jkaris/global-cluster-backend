@@ -6,6 +6,7 @@ class IsCompanyOrAdmin(BasePermission):
     Custom permission class to check if the user making the request is authenticated and has a user type of 'company'
     or 'admin'.
     """
+
     def has_permission(self, request, view):
         """
         Check if the user making the request is authenticated and has a user type of 'company' or 'admin'.

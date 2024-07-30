@@ -6,13 +6,15 @@ class ProductSerializer(serializers.ModelSerializer):
     """
     Serializer for the Product model.
     """
+
     class Meta:
         """
         Meta class for the Product model.
         """
+
         model = Product
         fields = "__all__"
-        read_only_fields = ('company',)
+        read_only_fields = ("company",)
 
     def validate(self, data):
         """
@@ -27,10 +29,10 @@ class ProductSerializer(serializers.ModelSerializer):
                 )
             # Set the company here, before validation
             if user.user_type == "company":
-                data['company'] = user.companyprofile
+                data["company"] = user.companyprofile
             elif user.user_type == "admin":
                 # For admin, you might want to require them to specify a company
-                if 'company' not in data:
+                if "company" not in data:
                     raise serializers.ValidationError("Admin must specify a company.")
         return data
 
@@ -46,13 +48,17 @@ class SupportTicketSerializer(serializers.ModelSerializer):
     """
     Serializer for the SupportTicket model.
     """
+
     class Meta:
         """
         Meta class for the SupportTicket model.
         """
+
         model = SupportTicket
         fields = "__all__"
-        read_only_fields = ('submitted_by',)  # Make submitted_by read-only in the serializer
+        read_only_fields = (
+            "submitted_by",
+        )  # Make submitted_by read-only in the serializer
 
     def validate(self, data):
         """
@@ -66,7 +72,7 @@ class SupportTicketSerializer(serializers.ModelSerializer):
                     "Only individuals or companies can create support tickets."
                 )
             # Set the submitted_by field here, before validation
-            data['submitted_by'] = user
+            data["submitted_by"] = user
         return data
 
     def create(self, validated_data):

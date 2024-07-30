@@ -7,58 +7,25 @@ class CustomUserSerializer(serializers.ModelSerializer):
     """
     Serializer for CustomUser
     """
-    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
-        """
-        Meta class for CustomUser
-        """
         model = CustomUser
-        fields = ["id", "email", "name", "user_type", "password", "profile_picture"]
-
-    def create(self, validated_data):
-        """
-        Create and return a new `CustomUser` instance, given the validated data.
-        :param validated_data:
-        :return:
-        """
-        password = validated_data.pop("password")
-        user = CustomUser(**validated_data)
-        user.set_password(password)
-        user.save()
-        return user
-
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `CustomUser` instance, given the validated data.
-        :param instance:
-        :param validated_data:
-        :return:
-        """
-        password = validated_data.pop("password", None)
-        if password:
-            instance.set_password(password)
-        return super().update(instance, validated_data)
+        fields = ["email", "password", "name", "user_type"]
+        extra_kwargs = {"password": {"write_only": True}}
 
 
 class IndividualProfileSerializer(serializers.ModelSerializer):
     """
     Serializer for IndividualProfile
     """
-    email = serializers.EmailField(write_only=True)
-    password = serializers.CharField(write_only=True)
-    user_type = serializers.CharField(write_only=True)
-    user_id = serializers.IntegerField(source='user.id', read_only=True)
-    is_active = serializers.BooleanField(default=True, write_only=True)
-    created_at = serializers.DateTimeField(source='user.date_joined', read_only=True)
 
     class Meta:
         """
-        Meta class for IndividualProfile
+        Meta class for IndividualProfileSerializer
         """
+
         model = IndividualProfile
         fields = [
-            "user_id",
             "first_name",
             "last_name",
             "gender",
@@ -67,167 +34,101 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
             "country",
             "state",
             "city",
-            "email",
-            "password",
-            "user_type",
-            "status",
-            "is_active",
-            "created_at"
         ]
-
-    def create(self, validated_data):
-        """
-        Create and return a new `IndividualProfile` instance, given the validated data.
-        :param validated_data:
-        :return:
-        """
-        user_data = {
-            "email": validated_data.pop("email"),
-            "password": validated_data.pop("password"),
-            "user_type": validated_data.pop("user_type"),
-            "is_active": validated_data.pop("is_active"),
-        }
-        user = CustomUser.objects.create_user(**user_data)
-        individual_profile = IndividualProfile.objects.create(
-            user=user, **validated_data
-        )
-        return individual_profile
-
-    def to_representation(self, instance):
-        """
-        Convert the `IndividualProfile` object to a JSON representation.
-        :param instance:
-        :return:
-        """
-        representation = super().to_representation(instance)
-        representation['user_id'] = instance.user.id
-        representation['status'] = instance.status
-        representation['is_active'] = instance.user.is_active
-        representation['created_at'] = instance.date_joined
-        representation['user_type'] = instance.user.user_type
-        representation['email'] = instance.user.email
-        return representation
-
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `IndividualProfile` instance, given the validated data.
-        :param instance:
-        :param validated_data:
-        :return:
-        """
-        user_data = {
-            "email": validated_data.pop("email", None),
-            "password": validated_data.pop("password", None),
-            "user_type": validated_data.pop("user_type", None),
-            "is_active": validated_data.pop("is_active", instance.user.is_active),
-        }
-        user = instance.user
-
-        if user_data["email"]:
-            user.email = user_data["email"]
-        if user_data["password"]:
-            user.set_password(user_data["password"])
-        if user_data["user_type"]:
-            user.user_type = user_data["user_type"]
-        user.is_active = user_data["is_active"]
-
-        user.save()
-        instance = super().update(instance, validated_data)
-        return instance
 
 
 class CompanyProfileSerializer(serializers.ModelSerializer):
     """
     Serializer for CompanyProfile
     """
-    email = serializers.EmailField(write_only=True)
-    password = serializers.CharField(write_only=True)
-    user_type = serializers.CharField(write_only=True)
-    is_active = serializers.BooleanField(default=True, write_only=True)
-    user_id = serializers.IntegerField(source='user.id', read_only=True)  # Add this line
-    created_at = serializers.DateTimeField(source='user.date_joined', read_only=True)
 
     class Meta:
         """
-        Meta class for CompanyProfile
+        Meta class for CompanyProfileSerializer
         """
+
         model = CompanyProfile
         fields = [
-            "user_id",
             "company_name",
             "company_registration_number",
             "phone_number",
             "address",
             "country",
-            "user_type",
-            "email",
-            "password",
-            "is_active",
-            "created_at",
         ]
+
+
+class SignupSerializer(serializers.Serializer):
+    """
+    Serializer for user signup.
+    """
+
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    # name = serializers.CharField()
+    user_type = serializers.ChoiceField(choices=["individual", "company"])
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    gender = serializers.ChoiceField(choices=["male", "female"], required=False)
+    phone_number = serializers.CharField(required=False)
+    address = serializers.CharField(required=False)
+    country = serializers.CharField(required=False)
+    state = serializers.CharField(required=False)
+    city = serializers.CharField(required=False)
+    company_name = serializers.CharField(required=False)
+    company_registration_number = serializers.CharField(required=False)
 
     def create(self, validated_data):
         """
-        Create and return a new `CompanyProfile` instance, given the validated data.
-        :param validated_data:
-        :return:
+        Create a new user and their corresponding profile based on the validated data.
+
+        Parameters:
+            validated_data (dict): A dictionary containing the validated data for creating a new user and profile.
+
+        Returns:
+            CustomUser
         """
-        user_data = {
-            "email": validated_data.pop("email"),
-            "password": validated_data.pop("password"),
-            "user_type": validated_data.pop("user_type"),
-            "is_active": validated_data.pop("is_active"),
-        }
+
+        user_fields = ["email", "password", "user_type"]
+        user_data = {field: validated_data.pop(field) for field in user_fields}
+
         user = CustomUser.objects.create_user(**user_data)
-        company_profile = CompanyProfile.objects.create(user=user, **validated_data)
-        return company_profile
 
-    def to_representation(self, instance):
+        if user.user_type == "individual":
+            IndividualProfile.objects.create(user=user, **validated_data)
+        elif user.user_type == "company":
+            CompanyProfile.objects.create(user=user, **validated_data)
+
+        return user
+
+    def validate(self, data):
         """
-        Convert the `CompanyProfile` object to a JSON representation.
-        :param instance:
+        Validate the data provided in the request.
+        :param data:
         :return:
         """
-        representation = super().to_representation(instance)
-        representation['user_id'] = instance.user.id
-        representation['user_type'] = instance.user.user_type
-        representation['email'] = instance.user.email
-        representation['status'] = instance.status
-        representation['is_active'] = instance.user.is_active
-        return representation
+        user_type = data.get("user_type")
 
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `CompanyProfile` instance, given the validated data.
-        :param instance:
-        :param validated_data:
-        :return:
-        """
-        user_data = {
-            "email": validated_data.pop("email", None),
-            "password": validated_data.pop("password", None),
-            "user_type": validated_data.pop("user_type", None),
-            "is_active": validated_data.pop("is_active", instance.user.is_active),
-        }
-        user = instance.user
+        if user_type == "individual":
+            required_fields = ["first_name", "last_name", "gender"]
+        elif user_type == "company":
+            required_fields = ["company_name", "company_registration_number"]
+        else:
+            raise serializers.ValidationError("Invalid user type")
 
-        if user_data["email"]:
-            user.email = user_data["email"]
-        if user_data["password"]:
-            user.set_password(user_data["password"])
-        if user_data["user_type"]:
-            user.user_type = user_data["user_type"]
-        user.is_active = user_data["is_active"]
+        for field in required_fields:
+            if not data.get(field):
+                raise serializers.ValidationError(
+                    f"{field} is required for {user_type} signup"
+                )
 
-        user.save()
-        instance = super().update(instance, validated_data)
-        return instance
+        return data
 
 
 class CustomUserTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
     Serializer for CustomUserTokenObtainPair
     """
+
     def validate(self, attrs):
         """
         Validate and return the user and access token pair.
@@ -237,25 +138,28 @@ class CustomUserTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
 
         user = self.user
-        if user.user_type == 'individual':
-            profile_data = IndividualProfileSerializer(IndividualProfile.objects.get(user=user)).data
-        elif user.user_type == 'company':
-            profile_data = CompanyProfileSerializer(CompanyProfile.objects.get(user=user)).data
+        if user.user_type == "individual":
+            profile_data = IndividualProfileSerializer(
+                IndividualProfile.objects.get(user=user)
+            ).data
+        elif user.user_type == "company":
+            profile_data = CompanyProfileSerializer(
+                CompanyProfile.objects.get(user=user)
+            ).data
         else:
             profile_data = {}
 
-        data.update({
-            "refresh": data.get("refresh"),
-            "access": data.get("access"),
-            "user": {
-                "email": user.email,
-                "is_active": user.is_active,
-                "user_type": user.user_type,
-                "profile": {
-                    **profile_data
-                }
+        data.update(
+            {
+                "refresh": data.get("refresh"),
+                "access": data.get("access"),
+                "user": {
+                    "email": user.email,
+                    "is_active": user.is_active,
+                    "user_type": user.user_type,
+                    "profile": {**profile_data},
+                },
             }
-        })
+        )
 
         return data
-

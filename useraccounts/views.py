@@ -1,16 +1,93 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, permissions
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import IndividualProfile, CompanyProfile
-from .serializers import IndividualProfileSerializer, CompanyProfileSerializer, CustomUserTokenObtainPairSerializer
+from .serializers import (
+    IndividualProfileSerializer,
+    CompanyProfileSerializer,
+    CustomUserTokenObtainPairSerializer,
+    SignupSerializer,
+)
+
+
+class SignupView(generics.CreateAPIView):
+    """
+    API endpoint that allows users to signup.
+    """
+
+    serializer_class = SignupSerializer
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create and return a new `User` instance, given the validated data.
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        refresh = RefreshToken.for_user(user)
+
+        response_data = {
+            "user_id": user.id,
+            "email": user.email,
+            "user_type": user.user_type,
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }
+
+        if user.user_type == "individual":
+            profile = IndividualProfile.objects.get(user=user)
+            response_data.update(
+                {
+                    "first_name": profile.first_name,
+                    "last_name": profile.last_name,
+                    "gender": profile.gender,
+                    "phone_number": profile.phone_number,
+                    "address": profile.address,
+                    "country": profile.country,
+                    "state": profile.state,
+                    "city": profile.city,
+                }
+            )
+        elif user.user_type == "company":
+            profile = CompanyProfile.objects.get(user=user)
+            response_data.update(
+                {
+                    "company_name": profile.company_name,
+                    "company_registration_number": profile.company_registration_number,
+                    "phone_number": profile.phone_number,
+                    "address": profile.address,
+                    "country": profile.country,
+                }
+            )
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+class CompanyProfileView(generics.ListAPIView):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+
+    queryset = CompanyProfile.objects.all()
+    serializer_class = CompanyProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class IndividualProfileViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+
     queryset = IndividualProfile.objects.all()
     serializer_class = IndividualProfileSerializer
 
@@ -29,8 +106,8 @@ class IndividualProfileViewSet(viewsets.ModelViewSet):
 
         # Include the user_id in the response
         response_data = serializer.data
-        response_data['user_id'] = serializer.instance.user.id
-        response_data['email'] = serializer.instance.user.email
+        response_data["user_id"] = serializer.instance.user.id
+        response_data["email"] = serializer.instance.user.email
         response_data["created_at"] = serializer.instance.date_joined
         response_data["status"] = serializer.instance.status
 
@@ -41,6 +118,7 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+
     queryset = CompanyProfile.objects.all()
     serializer_class = CompanyProfileSerializer
 
@@ -64,12 +142,12 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
 
         # Include the user_id in the response
         response_data = serializer.data
-        response_data['user_id'] = serializer.instance.user.id
-        response_data['email'] = serializer.instance.user.email
+        response_data["user_id"] = serializer.instance.user.id
+        response_data["email"] = serializer.instance.user.email
         response_data["created_at"] = serializer.instance.date_joined
         response_data["status"] = serializer.instance.status
-        response_data['refresh'] = str(refresh)
-        response_data['access'] = str(access)
+        response_data["refresh"] = str(refresh)
+        response_data["access"] = str(access)
 
         return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -78,4 +156,5 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     """
     Custom TokenObtainPairView
     """
+
     serializer_class = CustomUserTokenObtainPairSerializer

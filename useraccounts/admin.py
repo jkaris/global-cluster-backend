@@ -8,6 +8,7 @@ class UserAdmin(BaseUserAdmin):
     """
     Define admin model for custom User model with no email field
     """
+
     form = UserChangeForm
     add_form = UserCreationForm
 
@@ -15,7 +16,10 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ("user_type", "is_staff", "is_active")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Personal Info", {"fields": ("name", "user_type", "profile_picture", "status")}),
+        (
+            "Personal Info",
+            {"fields": ("name", "user_type", "profile_picture", "status")},
+        ),
         ("Permissions", {"fields": ("is_staff", "is_active", "is_superuser")}),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
@@ -49,6 +53,7 @@ class CompanyProfileAdmin(admin.ModelAdmin):
     """
     Admin class for the CompanyProfile model.
     """
+
     list_display = (
         "user",
         "company_name",
@@ -64,6 +69,7 @@ class IndividualProfileAdmin(admin.ModelAdmin):
     """
     Admin class for the IndividualProfile model.
     """
+
     list_display = (
         "user",
         "first_name",

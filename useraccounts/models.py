@@ -61,6 +61,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
     Custom user model with email as the unique identifier.
     """
+
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
@@ -95,6 +96,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         """
         Meta class for the CustomUser model.
         """
+
         verbose_name = "Custom User"
         verbose_name_plural = "Custom Users"
 
@@ -110,6 +112,7 @@ class IndividualProfile(models.Model):
     """
     Individual profile model.
     """
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -127,14 +130,13 @@ class IndividualProfile(models.Model):
         ("approved", "Approved"),
         ("declined", "Declined"),
     ]
-    status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="pending"
-    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
     class Meta:
         """
         Meta class for the IndividualProfile model.
         """
+
         unique_together = ("first_name", "last_name")
         verbose_name = "Individual Profile"
         verbose_name_plural = "Individual Profiles"
@@ -151,6 +153,7 @@ class CompanyProfile(models.Model):
     """
     Company profile model.
     """
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     company_name = models.CharField(max_length=100)
     company_registration_number = models.CharField(max_length=50)
@@ -159,16 +162,16 @@ class CompanyProfile(models.Model):
     country = models.CharField(max_length=50)
     date_joined = models.DateField(auto_now_add=True)
     STATUS_CHOICES = [
-        ("active", "Active"), ("pending", "Pending"),
+        ("active", "Active"),
+        ("pending", "Pending"),
     ]
-    status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="pending"
-    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
     class Meta:
         """
         Meta class for the CompanyProfile model.
         """
+
         verbose_name = "Company Profile"
         verbose_name_plural = "Company Profiles"
 

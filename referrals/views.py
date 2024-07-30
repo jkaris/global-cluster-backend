@@ -23,19 +23,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated, IsCompanyOrAdmin]
 
-    def get_permissions(self):
-        """
-        Determine the appropriate permissions for the current view action.
-
-        Returns:
-            list: A list of permission instances based on the current view action.
-        """
-        if self.action in ["list", "retrieve"]:
-            permission_classes = [AllowAny]
-        else:
-            permission_classes = [IsAuthenticated, IsCompanyOrAdmin]
-        return [permission() for permission in permission_classes]
-
     def perform_create(self, serializer):
         """
         Save a new product instance using the provided serializer.
@@ -67,7 +54,8 @@ class ProductViewSet(viewsets.ModelViewSet):
             None
         """
         if self.request.user.user_type not in ["company", "admin"]:
-            raise PermissionDenied("You do not have permission to update a product.")
+            if self.request.user is not serializer.instance.company.user:
+                raise PermissionDenied("You do not have permission to update a product.")
         serializer.save()
 
 

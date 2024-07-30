@@ -154,10 +154,11 @@ class CustomUserTokenObtainPairSerializer(TokenObtainPairSerializer):
                 "refresh": data.get("refresh"),
                 "access": data.get("access"),
                 "user": {
+                    "user_id": user.id,
                     "email": user.email,
                     "is_active": user.is_active,
                     "user_type": user.user_type,
-                    "profile": {**profile_data},
+                    "profile": {**profile_data, "user_id": user.id},
                 },
             }
         )

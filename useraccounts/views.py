@@ -73,14 +73,39 @@ class SignupView(generics.CreateAPIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
-class CompanyProfileView(generics.ListAPIView):
+class CompanyProfileView(generics.RetrieveUpdateAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
 
-    queryset = CompanyProfile.objects.all()
+    # queryset = CompanyProfile.objects.all()
     serializer_class = CompanyProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return CompanyProfile.objects.get(user=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        profile = self.get_object()
+        serializer = self.get_serializer(profile)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        profile = self.get_object()
+        serializer = self.get_serializer(profile, data=request.data)
+        # Include the user_id in the response
+        response_data = serializer.data
+        response_data["user_id"] = serializer.instance.user.id
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def patch(self, request, *args, **kwargs):
+        profile = self.get_object()
+        serializer = self.get_serializer(profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class IndividualProfileViewSet(viewsets.ModelViewSet):

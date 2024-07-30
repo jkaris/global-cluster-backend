@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import IndividualProfile, CompanyProfile
 from .serializers import IndividualProfileSerializer, CompanyProfileSerializer, CustomUserTokenObtainPairSerializer
@@ -56,12 +57,19 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
+        # Generate tokens
+        user = serializer.instance.user
+        refresh = RefreshToken.for_user(user)
+        access = refresh.access_token
+
         # Include the user_id in the response
         response_data = serializer.data
         response_data['user_id'] = serializer.instance.user.id
         response_data['email'] = serializer.instance.user.email
         response_data["created_at"] = serializer.instance.date_joined
         response_data["status"] = serializer.instance.status
+        response_data['refresh'] = str(refresh)
+        response_data['access'] = str(access)
 
         return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 

@@ -13,7 +13,7 @@ class Product(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product_name = models.CharField(max_length=255)
     company = models.ForeignKey(
-        CompanyProfile, on_delete=models.CASCADE, related_name="products"
+        CustomUser, on_delete=models.CASCADE, related_name="products"
     )
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)

@@ -38,7 +38,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         """
         if self.request.user.user_type not in ["company", "admin"]:
             raise PermissionDenied("You do not have permission to create a product.")
-        serializer.save(company=self.request.user.companyprofile)
+        serializer.save(company=self.request.user)
 
     def perform_update(self, serializer):
         """

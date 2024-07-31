@@ -31,6 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
             if user.user_type == "company":
                 data["company"] = user.companyprofile
             elif user.user_type == "admin":
+                data["company"] = user
                 # For admin, you might want to require them to specify a company
                 if "company" not in data:
                     raise serializers.ValidationError("Admin must specify a company.")

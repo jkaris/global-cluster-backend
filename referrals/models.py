@@ -209,6 +209,14 @@ class Staff(models.Model):
         ],
     )
 
+    class Meta:
+        """
+        Meta class for the Staff model.
+        """
+
+        verbose_name = "Staff"
+        verbose_name_plural = "Staff"
+
     def __str__(self):
         """
         Returns a string representation of the object.

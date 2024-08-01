@@ -3,13 +3,14 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Product, SupportTicket, UserRanking
+from rest_framework.permissions import IsAuthenticated
+from .models import Product, SupportTicket, UserRanking, Staff
 from .serializers import (
     ProductSerializer,
     SupportTicketSerializer,
     UserRankingSerializer,
     VerifyAccountSerializer,
+    StaffSerializer,
 )
 from .permissions import IsCompanyOrAdmin
 
@@ -177,3 +178,34 @@ class VerifyAccountView(GenericAPIView):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class StaffViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for the Staff model.
+    """
+
+    queryset = Staff.objects.all()
+    serializer_class = StaffSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """
+        Saves the data from the serializer into the database.
+
+        Args:
+            serializer (Serializer): The serializer instance containing the data to be saved.
+
+        Returns:
+            None
+        """
+        serializer.save()
+
+    def get_queryset(self):
+        """
+        Get all Staff objects from the database.
+
+        Returns:
+            QuerySet: A queryset containing all Staff objects.
+        """
+        return Staff.objects.all()

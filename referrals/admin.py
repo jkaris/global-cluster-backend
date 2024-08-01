@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Product, SupportTicket, UserRanking
+from .models import Product, SupportTicket, UserRanking, Staff
 
 
 @admin.register(Product)
@@ -31,3 +31,13 @@ class UserRankingAdmin(admin.ModelAdmin):
 
     list_display = ["rank_level", "status", "name", "total_recruits", "bonus"]
     list_filter = ["name"]
+
+
+@admin.register(Staff)
+class StaffAdmin(admin.ModelAdmin):
+    """
+    Admin class for the Staff model.
+    """
+
+    list_display = ["first_name", "last_name", "phone_number", "role"]
+    list_filter = ["role"]

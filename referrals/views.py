@@ -24,6 +24,30 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsCompanyOrAdmin]
 
     def update(self, request, *args, **kwargs):
+        """
+        Update an instance of the model using the provided serializer.
+
+        Parameters:
+            request (Request): The HTTP request object.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            Response: The serialized data of the updated instance.
+
+        Raises:
+            ValidationError: If the serializer is not valid.
+
+        Description:
+            This function updates an instance of the model using the provided serializer. It first pops the 'partial'
+            keyword argument from the kwargs dictionary and assigns it to the 'partial' variable. It then retrieves the
+            instance using the 'get_object' method and creates a serializer using the 'get_serializer' method. The
+            serializer is initialized with the instance, the request data, and the 'partial' variable. The serializer is
+            validated using the 'is_valid' method, and if it is not valid, a 'ValidationError' is raised. The
+            'perform_update' method is then called with the serializer as an argument. If the instance has a
+            '_prefetched_objects_cache' attribute, it is set to an empty dictionary. Finally, a response is returned
+            containing the serialized data of the updated instance.
+        """
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)

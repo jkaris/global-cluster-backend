@@ -17,6 +17,19 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ("company",)
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the serializer instance.
+
+        This method is called when a serializer instance is created. It sets the `required` attribute of all fields to `False` if the request method is either "PUT" or "PATCH".
+
+        Parameters:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+                context (dict, optional): The context of the serializer. Defaults to None.
+
+        Returns:
+            None
+        """
         super().__init__(*args, **kwargs)
         request = self.context.get("request") if 'context' in kwargs else None
         if request and request.method in ["PUT", "PATCH"]:

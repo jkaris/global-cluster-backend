@@ -1,8 +1,8 @@
 import requests
+import logging
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from .models import Product, SupportTicket, UserRanking, Staff
 from .serializers import (
@@ -12,7 +12,9 @@ from .serializers import (
     VerifyAccountSerializer,
     StaffSerializer,
 )
-from .permissions import IsCompanyOrAdmin
+from .permissions import IsOwnerOrAdmin
+
+logger = logging.getLogger(__name__)
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -22,80 +24,32 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated, IsCompanyOrAdmin]
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.user_type == 'admin':
+            return Product.objects.all()
+        elif user.user_type == 'company':
+            return Product.objects.filter(company=user)
+        else:
+            return Product.objects.none()
 
     def update(self, request, *args, **kwargs):
         """
         Update an instance of the model using the provided serializer.
-
-        Parameters:
-            request (Request): The HTTP request object.
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-
-        Returns:
-            Response: The serialized data of the updated instance.
-
-        Raises:
-            ValidationError: If the serializer is not valid.
-
-        Description:
-            This function updates an instance of the model using the provided serializer. It first pops the 'partial'
-            keyword argument from the kwargs dictionary and assigns it to the 'partial' variable. It then retrieves the
-            instance using the 'get_object' method and creates a serializer using the 'get_serializer' method. The
-            serializer is initialized with the instance, the request data, and the 'partial' variable. The serializer is
-            validated using the 'is_valid' method, and if it is not valid, a 'ValidationError' is raised. The
-            'perform_update' method is then called with the serializer as an argument. If the instance has a
-            '_prefetched_objects_cache' attribute, it is set to an empty dictionary. Finally, a response is returned
-            containing the serialized data of the updated instance.
         """
-        partial = kwargs.pop('partial', False)
+        logger.info(f"Updating product: {request.data}")
+        partial = kwargs.pop('partial', True)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
         if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
-
-    def perform_create(self, serializer):
-        """
-        Save a new product instance using the provided serializer.
-
-        Args:
-            serializer (Serializer): The serializer instance containing the product data.
-
-        Raises:
-            PermissionDenied: If the user is not a company or admin.
-
-        Returns:
-            None
-        """
-        if self.request.user.user_type not in ["company", "admin"]:
-            raise PermissionDenied("You do not have permission to create a product.")
-        serializer.save(company=self.request.user)
-
-    def perform_update(self, serializer):
-        """
-        Save the updated product instance using the provided serializer.
-
-        Args:
-            serializer (Serializer): The serializer instance containing the updated product data.
-
-        Raises:
-            PermissionDenied: If the user is not a company or admin.
-
-        Returns:
-            None
-        """
-        if self.request.user.user_type not in ["company", "admin"]:
-            if self.request.user != serializer.instance.company.user:
-                raise PermissionDenied("You do not have permission to update this product.")
-        serializer.save()
 
 
 class SupportTicketViewSet(viewsets.ModelViewSet):

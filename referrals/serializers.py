@@ -17,63 +17,6 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ("company",)
 
-    def __init__(self, *args, **kwargs):
-        """
-        Initializes the serializer instance.
-
-        This method is called when a serializer instance is created. It sets the `required` attribute of all fields to `False` if the request method is either "PUT" or "PATCH".
-
-        Parameters:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-                context (dict, optional): The context of the serializer. Defaults to None.
-
-        Returns:
-            None
-        """
-        super().__init__(*args, **kwargs)
-        request = self.context.get("request") if 'context' in kwargs else None
-        if request and request.method in ["PUT", "PATCH"]:
-            for field in self.fields.values():
-                field.required = False
-
-    def validate(self, data):
-        """
-        Validates the data provided in the request.
-        """
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
-            if user.user_type not in ["company", "admin"]:
-                raise serializers.ValidationError(
-                    "Only companies or admins can create products."
-                )
-            # Set the company here, before validation
-            if user.user_type == "company":
-                data["company"] = user.companyprofile
-            elif user.user_type == "admin":
-                data["company"] = user
-                # For admin, you might want to require them to specify a company
-                if "company" not in data:
-                    raise serializers.ValidationError("Admin must specify a company.")
-        return data
-
-    def create(self, validated_data):
-        """
-        Create and return a new `Product` instance, given the validated data.
-        """
-        # The company should already be in validated_data from the validate method
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Product` instance, given the validated data.
-        """
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
-
 
 class SupportTicketSerializer(serializers.ModelSerializer):
     """

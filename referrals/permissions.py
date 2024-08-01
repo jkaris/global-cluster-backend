@@ -23,3 +23,13 @@ class IsCompanyOrAdmin(BasePermission):
             and request.user.is_authenticated
             and request.user.user_type in ["company", "admin"]
         )
+
+
+class IsOwnerOrAdmin(BasePermission):
+    """
+    Custom permission to only allow owners or admins to access the object.
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.user.user_type == 'admin':
+            return True
+        return obj.company == request.user

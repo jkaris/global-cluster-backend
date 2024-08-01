@@ -5,12 +5,14 @@ from .views import (
     SupportTicketViewSet,
     UserRankingViewSet,
     VerifyAccountView,
+    StaffViewSet,
 )
 
 router = DefaultRouter()
 router.register(r"products", ProductViewSet)
 router.register(r"supporttickets", SupportTicketViewSet)
 router.register(r"userrankings", UserRankingViewSet)
+router.register(r"staff", StaffViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),

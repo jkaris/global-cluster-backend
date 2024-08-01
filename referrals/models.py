@@ -3,6 +3,8 @@ from uuid import uuid4
 from django.core.validators import MaxValueValidator, FileExtensionValidator
 from useraccounts.models import CompanyProfile, CustomUser
 from .validators import validate_file_size
+from django.conf import settings
+from useraccounts.models import CustomUser
 
 
 class Product(models.Model):
@@ -189,3 +191,93 @@ class UserRanking(models.Model):
         :rtype: str
         """
         return self.name
+
+
+class Staff(models.Model):
+    """
+    Staff model for the referral program.
+    """
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='staff_profile')
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20)
+    role = models.CharField(
+        max_length=20,
+        choices=[
+            ("admin", "Admin"),
+            ("superadmin", "Superadmin"),
+        ],
+    )
+
+    def __str__(self):
+        """
+        Returns a string representation of the object.
+
+        :return: A string containing the first name and last name of the object.
+        :rtype: str
+        """
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def full_name(self):
+        """
+        Returns the full name of the object as a string.
+
+        :return: A string containing the first name and last name of the object.
+        :rtype: str
+        """
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def email(self):
+        """
+        Returns the email address associated with the user object.
+
+        :return: The email address of the user.
+        :rtype: str
+        """
+        return self.user.email
+
+    @property
+    def is_active(self):
+        """
+        Returns whether the user associated with this staff member is active or not.
+
+        :return: A boolean indicating whether the user is active or not.
+        :rtype: bool
+        """
+        return self.user.is_active
+
+    @property
+    def is_superuser(self):
+        return self.role == 'superadmin'
+
+    def enable(self):
+        """
+        Enables the user associated with this staff member.
+
+        This function sets the `is_active` attribute of the user object to `True` and saves the changes to the database.
+
+        Parameters:
+            self (Staff): The staff object.
+
+        Returns:
+            None
+        """
+        self.user.is_active = True
+        self.user.save()
+
+    def disable(self):
+        """
+        Disables the user associated with this staff member.
+
+        This function sets the `is_active` attribute of the user object to `False` and saves the changes to the database.
+
+        Parameters:
+            self (Staff): The staff object.
+
+        Returns:
+            None
+        """
+        self.user.is_active = False
+        self.user.save()

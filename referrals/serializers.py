@@ -16,6 +16,13 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ("company",)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request") if 'context' in kwargs else None
+        if request and request.method in ["PUT", "PATCH"]:
+            for field in self.fields.values():
+                field.required = False
+
     def validate(self, data):
         """
         Validates the data provided in the request.
@@ -43,6 +50,15 @@ class ProductSerializer(serializers.ModelSerializer):
         """
         # The company should already be in validated_data from the validate method
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Update and return an existing `Product` instance, given the validated data.
+        """
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 
 class SupportTicketSerializer(serializers.ModelSerializer):

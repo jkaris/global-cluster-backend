@@ -101,9 +101,9 @@ class StaffSerializer(serializers.ModelSerializer):
     Serializer for the Staff model.
     """
 
-    email = serializers.EmailField(source='user.email', read_only=True)
-    name = serializers.CharField(source='user.name')
-    phone_number = serializers.CharField(source='user.phone_number')
+    email = serializers.EmailField(source="user.email", read_only=True)
+    name = serializers.CharField(source="user.name")
+    phone_number = serializers.CharField(source="user.phone_number")
 
     class Meta:
         model = Staff

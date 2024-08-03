@@ -32,12 +32,12 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
 
 
 class CompanyProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(source='user.email', read_only=True)
-    name = serializers.CharField(source='user.name')
-    phone_number = serializers.CharField(source='user.phone_number')
-    address = serializers.CharField(source='user.address')
-    country = serializers.CharField(source='user.country')
-    status = serializers.CharField(source='user.status', read_only=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
+    name = serializers.CharField(source="user.name")
+    phone_number = serializers.CharField(source="user.phone_number")
+    address = serializers.CharField(source="user.address")
+    country = serializers.CharField(source="user.country")
+    status = serializers.CharField(source="user.status", read_only=True)
 
     class Meta:
         model = CompanyProfile
@@ -52,7 +52,7 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('user', {})
+        user_data = validated_data.pop("user", {})
         for attr, value in user_data.items():
             setattr(instance.user, attr, value)
         instance.user.save()
@@ -86,8 +86,20 @@ class SignupSerializer(serializers.Serializer):
     company_registration_number = serializers.CharField(required=False)
 
     def create(self, validated_data):
-        user_fields = ["email", "password", "user_type", "name", "phone_number", "address", "country"]
-        user_data = {field: validated_data.pop(field) for field in user_fields if field in validated_data}
+        user_fields = [
+            "email",
+            "password",
+            "user_type",
+            "name",
+            "phone_number",
+            "address",
+            "country",
+        ]
+        user_data = {
+            field: validated_data.pop(field)
+            for field in user_fields
+            if field in validated_data
+        }
 
         user = CustomUser.objects.create_user(**user_data)
 
@@ -110,7 +122,9 @@ class SignupSerializer(serializers.Serializer):
 
         for field in required_fields:
             if not data.get(field):
-                raise serializers.ValidationError(f"{field} is required for {user_type} signup")
+                raise serializers.ValidationError(
+                    f"{field} is required for {user_type} signup"
+                )
 
         return data
 

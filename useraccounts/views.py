@@ -45,16 +45,20 @@ class SignupView(generics.CreateAPIView):
 
         if user.user_type == "individual":
             profile = IndividualProfile.objects.get(user=user)
-            response_data.update({
-                "gender": profile.gender,
-                "state": profile.state,
-                "city": profile.city,
-            })
+            response_data.update(
+                {
+                    "gender": profile.gender,
+                    "state": profile.state,
+                    "city": profile.city,
+                }
+            )
         elif user.user_type == "company":
             profile = CompanyProfile.objects.get(user=user)
-            response_data.update({
-                "company_registration_number": profile.company_registration_number,
-            })
+            response_data.update(
+                {
+                    "company_registration_number": profile.company_registration_number,
+                }
+            )
 
         return Response(response_data, status=status.HTTP_201_CREATED)
 
@@ -72,13 +76,13 @@ class CompanyProfileView(generics.RetrieveUpdateAPIView):
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        if getattr(instance, '_prefetched_objects_cache', None):
+        if getattr(instance, "_prefetched_objects_cache", None):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
@@ -87,7 +91,7 @@ class CompanyProfileView(generics.RetrieveUpdateAPIView):
         return self.update(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
-        kwargs['partial'] = True
+        kwargs["partial"] = True
         return self.update(request, *args, **kwargs)
 
 

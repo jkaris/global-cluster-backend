@@ -11,7 +11,6 @@ class Product(models.Model):
     """
     Product model.
     """
-
     uuid = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product_name = models.CharField(max_length=255)
     company = models.ForeignKey(

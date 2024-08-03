@@ -45,9 +45,7 @@ class SupportTicketSerializer(serializers.ModelSerializer):
 
         model = SupportTicket
         fields = "__all__"
-        read_only_fields = (
-            "submitted_by",
-        )
+        read_only_fields = ("submitted_by",)
 
     def validate(self, data):
         """
@@ -102,13 +100,22 @@ class StaffSerializer(serializers.ModelSerializer):
     """
     Serializer for the Staff model.
     """
-    email = serializers.EmailField(source='user.email')
-    is_active = serializers.BooleanField(source='user.is_active')
+
+    email = serializers.EmailField(source="user.email")
+    is_active = serializers.BooleanField(source="user.is_active")
 
     class Meta:
         model = Staff
-        fields = ['id', 'email', 'first_name', 'last_name', 'phone_number', 'role', 'is_active']
-        read_only_fields = ['id']
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "role",
+            "is_active",
+        ]
+        read_only_fields = ["id"]
 
     def create(self, validated_data):
         """
@@ -128,22 +135,22 @@ class StaffSerializer(serializers.ModelSerializer):
         Raises:
             None.
         """
-        user_data = validated_data.pop('user')
-        email = user_data['email']
-        password = self.context['request'].data.get('password')  # Get password from request data
+        user_data = validated_data.pop("user")
+        email = user_data["email"]
+        password = self.context["request"].data.get(
+            "password"
+        )  # Get password from request data
 
         user = CustomUser.objects.create_user(
-            email=email,
-            password=password,
-            user_type='admin'
+            email=email, password=password, user_type="admin"
         )
 
         staff = Staff.objects.create(user=user, **validated_data)
 
-        if staff.role == 'superadmin':
+        if staff.role == "superadmin":
             user.is_superuser = True
             user.is_staff = True
-        elif staff.role == 'admin':
+        elif staff.role == "admin":
             user.is_staff = True
         user.save()
 
@@ -171,7 +178,7 @@ class StaffSerializer(serializers.ModelSerializer):
             Note: This function assumes that the instance parameter is an instance of the Staff model and that
             the user attribute of the instance is an instance of the CustomUser model.
         """
-        user_data = validated_data.pop('user', {})
+        user_data = validated_data.pop("user", {})
         for attr, value in user_data.items():
             setattr(instance.user, attr, value)
         instance.user.save()

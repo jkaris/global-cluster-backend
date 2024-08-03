@@ -28,9 +28,9 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.user_type == 'admin':
+        if user.user_type == "admin":
             return Product.objects.all()
-        elif user.user_type == 'company':
+        elif user.user_type == "company":
             return Product.objects.filter(company=user)
         else:
             return Product.objects.none()
@@ -40,13 +40,13 @@ class ProductViewSet(viewsets.ModelViewSet):
         Update an instance of the model using the provided serializer.
         """
         logger.info(f"Updating product: {request.data}")
-        partial = kwargs.pop('partial', True)
+        partial = kwargs.pop("partial", True)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        if getattr(instance, '_prefetched_objects_cache', None):
+        if getattr(instance, "_prefetched_objects_cache", None):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)

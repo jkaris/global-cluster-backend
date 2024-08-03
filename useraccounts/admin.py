@@ -21,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
             {"fields": ("name", "user_type", "profile_picture", "status")},
         ),
         ("Permissions", {"fields": ("is_staff", "is_active", "is_superuser")}),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
+        ("Important dates", {"fields": ("last_login",)}),
     )
     add_fieldsets = (
         (
@@ -56,11 +56,7 @@ class CompanyProfileAdmin(admin.ModelAdmin):
 
     list_display = (
         "user",
-        "company_name",
         "company_registration_number",
-        "phone_number",
-        "address",
-        "country",
     )
 
 
@@ -70,13 +66,4 @@ class IndividualProfileAdmin(admin.ModelAdmin):
     Admin class for the IndividualProfile model.
     """
 
-    list_display = (
-        "user",
-        "first_name",
-        "last_name",
-        "phone_number",
-        "address",
-        "country",
-        "state",
-        "city",
-    )
+    list_display = ("user", "gender")

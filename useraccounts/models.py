@@ -11,17 +11,6 @@ class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """
         Create a new user with the given email and password.
-
-        Args:
-            email (str): The email address of the user.
-            password (str, optional): The password for the user. Defaults to None.
-            **extra_fields: Additional fields to be added to the user object.
-
-        Raises:
-            ValueError: If the email field is not provided.
-
-        Returns:
-            User
         """
         if not email:
             raise ValueError(_("The Email field must be set"))
@@ -34,17 +23,6 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         """
         Creates a superuser with the given email and password.
-
-        Parameters:
-            email (str): The email address of the superuser.
-            password (str, optional): The password for the superuser. Defaults to None.
-            **extra_fields: Additional fields to be set for the superuser.
-
-        Raises:
-            ValueError: If the superuser does not have is_staff=True or is_superuser=True.
-
-        Returns:
-            User
         """
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
@@ -59,11 +37,13 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
-    Custom user model with email as the unique identifier.
+    Custom user model.
     """
 
     email = models.EmailField(unique=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100
+    )  # This will be used for both individual and company names
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     user_type = models.CharField(
@@ -77,48 +57,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", null=True, blank=True
     )
-
-    def save(self, *args, **kwargs):
-        """
-        Save the object to the database.
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        super().save(*args, **kwargs)
-
-    objects = CustomUserManager()
-
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name", "user_type"]
-
-    class Meta:
-        """
-        Meta class for the CustomUser model.
-        """
-
-        verbose_name = "Custom User"
-        verbose_name_plural = "Custom Users"
-
-    def __str__(self):
-        """
-        Returns a string representation of the object.
-        :return: The email of the object.
-        """
-        return self.email
-
-
-class IndividualProfile(models.Model):
-    """
-    Individual profile model.
-    """
-
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    gender = models.CharField(
-        max_length=10, choices=[("male", "Male"), ("female", "Female")]
-    )
+    # Common fields
     phone_number = models.CharField(max_length=15)
     address = models.CharField(max_length=255)
     country = models.CharField(max_length=50)
@@ -129,24 +68,52 @@ class IndividualProfile(models.Model):
         ("pending", "Pending"),
         ("approved", "Approved"),
         ("declined", "Declined"),
+        ("active", "Active"),
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
-    class Meta:
-        """
-        Meta class for the IndividualProfile model.
-        """
+    objects = CustomUserManager()
 
-        unique_together = ("first_name", "last_name")
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["name", "user_type"]
+
+    class Meta:
+        verbose_name = "Custom User"
+        verbose_name_plural = "Custom Users"
+
+    def __str__(self):
+        """
+        Return the email of the user.
+        :return:
+        """
+        return self.email
+
+
+class IndividualProfile(models.Model):
+    """
+    Individual profile model.
+    """
+
+    user = models.OneToOneField(
+        CustomUser,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="individual_profile",
+    )
+    gender = models.CharField(
+        max_length=10, choices=[("male", "Male"), ("female", "Female")]
+    )
+
+    class Meta:
         verbose_name = "Individual Profile"
         verbose_name_plural = "Individual Profiles"
 
     def __str__(self):
         """
-        Returns a string representation of the object.
+        Return the name of the individual.
         :return:
         """
-        return f"{self.first_name} {self.last_name}"
+        return self.user.name
 
 
 class CompanyProfile(models.Model):
@@ -154,30 +121,21 @@ class CompanyProfile(models.Model):
     Company profile model.
     """
 
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
-    company_name = models.CharField(max_length=100)
+    user = models.OneToOneField(
+        CustomUser,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="company_profile",
+    )
     company_registration_number = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=15)
-    address = models.CharField(max_length=255)
-    country = models.CharField(max_length=50)
-    date_joined = models.DateField(auto_now_add=True)
-    STATUS_CHOICES = [
-        ("active", "Active"),
-        ("pending", "Pending"),
-    ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
     class Meta:
-        """
-        Meta class for the CompanyProfile model.
-        """
-
         verbose_name = "Company Profile"
         verbose_name_plural = "Company Profiles"
 
     def __str__(self):
         """
-        Returns a string representation of the object.
+        Return the name of the company.
         :return:
         """
-        return self.company_name
+        return self.user.name

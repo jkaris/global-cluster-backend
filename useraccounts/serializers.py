@@ -26,14 +26,8 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
 
         model = IndividualProfile
         fields = [
-            "first_name",
-            "last_name",
+            "user",
             "gender",
-            "phone_number",
-            "address",
-            "country",
-            "state",
-            "city",
         ]
 
 
@@ -49,11 +43,8 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
 
         model = CompanyProfile
         fields = [
-            "company_name",
+            "user",
             "company_registration_number",
-            "phone_number",
-            "address",
-            "country",
         ]
 
 

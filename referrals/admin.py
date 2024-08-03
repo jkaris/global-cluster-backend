@@ -39,5 +39,5 @@ class StaffAdmin(admin.ModelAdmin):
     Admin class for the Staff model.
     """
 
-    list_display = ["first_name", "last_name", "phone_number", "role"]
+    list_display = ["user", "role"]
     list_filter = ["role"]

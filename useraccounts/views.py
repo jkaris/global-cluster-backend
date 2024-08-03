@@ -77,13 +77,13 @@ class CompanyProfileView(generics.RetrieveUpdateAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
+
     serializer_class = CompanyProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         """
         Retrieves the `CompanyProfile` object associated with the currently authenticated user.
-
         Returns:
             CompanyProfile: The `CompanyProfile` object corresponding to the authenticated user.
 
@@ -95,12 +95,10 @@ class CompanyProfileView(generics.RetrieveUpdateAPIView):
     def get(self, request, *args, **kwargs):
         """
         Retrieves the `profile` object associated with the currently authenticated user and serializes it.
-
         Parameters:
             request (HttpRequest): The HTTP request object.
             *args: Variable length argument list.
             **kwargs: Arbitrary keyword arguments.
-
         Returns:
             Response: The serialized `profile` object.
         """

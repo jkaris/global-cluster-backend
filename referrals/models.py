@@ -11,6 +11,7 @@ class Product(models.Model):
     """
     Product model.
     """
+
     uuid = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product_name = models.CharField(max_length=255)
     company = models.ForeignKey(
@@ -196,10 +197,10 @@ class Staff(models.Model):
     """
     Staff model for the referral program.
     """
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='staff_profile')
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=20)
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="staff_profile"
+    )
     role = models.CharField(
         max_length=20,
         choices=[
@@ -223,7 +224,7 @@ class Staff(models.Model):
         :return: A string containing the first name and last name of the object.
         :rtype: str
         """
-        return f"{self.first_name} {self.last_name}"
+        return self.user.name
 
     @property
     def full_name(self):
@@ -233,7 +234,7 @@ class Staff(models.Model):
         :return: A string containing the first name and last name of the object.
         :rtype: str
         """
-        return f"{self.first_name} {self.last_name}"
+        return self.user.name
 
     @property
     def email(self):
@@ -257,7 +258,7 @@ class Staff(models.Model):
 
     @property
     def is_superuser(self):
-        return self.role == 'superadmin'
+        return self.role == "superadmin"
 
     def enable(self):
         """

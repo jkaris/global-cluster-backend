@@ -20,7 +20,20 @@ class UserCreationForm(forms.ModelForm):
         """
 
         model = CustomUser
-        fields = ("email", "name", "user_type", "profile_picture")
+        fields = (
+            "email",
+            "name",
+            "user_type",
+            "profile_picture",
+            "phone_number",
+            "address",
+            "country",
+            "status",
+            "is_active",
+            "is_staff",
+            "password1",
+            "password2",
+        )
 
     def clean_password2(self):
         """
@@ -53,7 +66,10 @@ class UserChangeForm(forms.ModelForm):
     password hash display field.
     """
 
-    password = ReadOnlyPasswordHashField()
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
+    password2 = forms.CharField(
+        label="Password confirmation", widget=forms.PasswordInput
+    )
 
     class Meta:
         """
@@ -63,19 +79,26 @@ class UserChangeForm(forms.ModelForm):
         model = CustomUser
         fields = (
             "email",
-            "password",
             "name",
             "user_type",
             "profile_picture",
+            "phone_number",
+            "address",
+            "country",
+            "status",
             "is_active",
             "is_staff",
+            "password1",
+            "password2",
         )
 
-    def clean_password(self):
+    def clean_password2(self):
         """
-        Regardless of what is entered in the password field, return the
-        initial value. This is done here, rather than on the field, because
-        the field does not have access to the initial value.
+        Verify that the two password entries match.
         :return:
         """
-        return self.initial["password"]
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords don't match")
+        return password2

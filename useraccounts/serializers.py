@@ -32,20 +32,36 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
 
 
 class CompanyProfileSerializer(serializers.ModelSerializer):
-    """
-    Serializer for CompanyProfile
-    """
+    email = serializers.EmailField(source='user.email', read_only=True)
+    name = serializers.CharField(source='user.name')
+    phone_number = serializers.CharField(source='user.phone_number')
+    address = serializers.CharField(source='user.address')
+    country = serializers.CharField(source='user.country')
+    status = serializers.CharField(source='user.status', read_only=True)
 
     class Meta:
-        """
-        Meta class for CompanyProfileSerializer
-        """
-
         model = CompanyProfile
         fields = [
-            "user",
+            "email",
+            "name",
+            "phone_number",
+            "address",
+            "country",
+            "status",
             "company_registration_number",
         ]
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        for attr, value in user_data.items():
+            setattr(instance.user, attr, value)
+        instance.user.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
 
 
 class SignupSerializer(serializers.Serializer):
@@ -55,32 +71,23 @@ class SignupSerializer(serializers.Serializer):
 
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-    # name = serializers.CharField()
+    name = serializers.CharField()
     user_type = serializers.ChoiceField(choices=["individual", "company"])
-    first_name = serializers.CharField(required=False)
-    last_name = serializers.CharField(required=False)
-    gender = serializers.ChoiceField(choices=["male", "female"], required=False)
     phone_number = serializers.CharField(required=False)
     address = serializers.CharField(required=False)
     country = serializers.CharField(required=False)
+
+    # Fields for individual
+    gender = serializers.ChoiceField(choices=["male", "female"], required=False)
     state = serializers.CharField(required=False)
     city = serializers.CharField(required=False)
-    company_name = serializers.CharField(required=False)
+
+    # Field for company
     company_registration_number = serializers.CharField(required=False)
 
     def create(self, validated_data):
-        """
-        Create a new user and their corresponding profile based on the validated data.
-
-        Parameters:
-            validated_data (dict): A dictionary containing the validated data for creating a new user and profile.
-
-        Returns:
-            CustomUser
-        """
-
-        user_fields = ["email", "password", "user_type"]
-        user_data = {field: validated_data.pop(field) for field in user_fields}
+        user_fields = ["email", "password", "user_type", "name", "phone_number", "address", "country"]
+        user_data = {field: validated_data.pop(field) for field in user_fields if field in validated_data}
 
         user = CustomUser.objects.create_user(**user_data)
 
@@ -92,25 +99,18 @@ class SignupSerializer(serializers.Serializer):
         return user
 
     def validate(self, data):
-        """
-        Validate the data provided in the request.
-        :param data:
-        :return:
-        """
         user_type = data.get("user_type")
 
         if user_type == "individual":
-            required_fields = ["first_name", "last_name", "gender"]
+            required_fields = ["gender", "state", "city"]
         elif user_type == "company":
-            required_fields = ["company_name", "company_registration_number"]
+            required_fields = ["company_registration_number"]
         else:
             raise serializers.ValidationError("Invalid user type")
 
         for field in required_fields:
             if not data.get(field):
-                raise serializers.ValidationError(
-                    f"{field} is required for {user_type} signup"
-                )
+                raise serializers.ValidationError(f"{field} is required for {user_type} signup")
 
         return data
 

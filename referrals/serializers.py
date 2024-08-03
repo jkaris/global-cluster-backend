@@ -101,16 +101,16 @@ class StaffSerializer(serializers.ModelSerializer):
     Serializer for the Staff model.
     """
 
-    email = serializers.EmailField(source="user.email")
-    is_active = serializers.BooleanField(source="user.is_active")
+    email = serializers.EmailField(source='user.email', read_only=True)
+    name = serializers.CharField(source='user.name')
+    phone_number = serializers.CharField(source='user.phone_number')
 
     class Meta:
         model = Staff
         fields = [
             "id",
             "email",
-            "first_name",
-            "last_name",
+            "name",
             "phone_number",
             "role",
             "is_active",
@@ -136,7 +136,7 @@ class StaffSerializer(serializers.ModelSerializer):
             None.
         """
         user_data = validated_data.pop("user")
-        email = user_data["email"]
+        email = self.context["request"].data.get("email")
         password = self.context["request"].data.get(
             "password"
         )  # Get password from request data

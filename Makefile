@@ -1,11 +1,11 @@
 migrate:
-	python manage.py migrate --noinput
+	DJANGO_SETTINGS_MODULE=global_cluster_backend.settings.base python manage.py migrate --noinput
 
 makemigrations: makemigrations
-	python manage.py loaddata sample_admin
+	DJANGO_SETTINGS_MODULE=global_cluster_backend.settings.base python manage.py makemigrations
 
 createsuperuser:
-	python manage.py createsuperuser
+	DJANGO_SETTINGS_MODULE=global_cluster_backend.settings.base python manage.py createsuperuser
 
 runserver:
-	python manage.py runserver
+	DJANGO_SETTINGS_MODULE=global_cluster_backend.settings.base python manage.py runserver

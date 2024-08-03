@@ -12,7 +12,6 @@ paths:
       - accounts
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -46,9 +45,57 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - {}
       responses:
         '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyProfile'
+          description: ''
+    put:
+      operationId: accounts_companies_update
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompanyProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanyProfile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyProfile'
+          description: ''
+    patch:
+      operationId: accounts_companies_partial_update
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyProfile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
           content:
             application/json:
               schema:
@@ -69,7 +116,6 @@ paths:
       - accounts
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -78,7 +124,7 @@ paths:
                 $ref: '#/components/schemas/CompanyProfile'
           description: ''
     put:
-      operationId: accounts_companies_update
+      operationId: accounts_companies_update_2
       description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
@@ -103,7 +149,6 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -112,7 +157,7 @@ paths:
                 $ref: '#/components/schemas/CompanyProfile'
           description: ''
     patch:
-      operationId: accounts_companies_partial_update
+      operationId: accounts_companies_partial_update_2
       description: API endpoint that allows users to be viewed or edited.
       parameters:
       - in: path
@@ -136,7 +181,6 @@ paths:
               $ref: '#/components/schemas/PatchedCompanyProfile'
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -158,7 +202,6 @@ paths:
       - accounts
       security:
       - jwtAuth: []
-      - {}
       responses:
         '204':
           description: No response body
@@ -170,7 +213,6 @@ paths:
       - accounts
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -204,7 +246,6 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - {}
       responses:
         '201':
           content:
@@ -227,7 +268,6 @@ paths:
       - accounts
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -261,7 +301,6 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -294,7 +333,6 @@ paths:
               $ref: '#/components/schemas/PatchedIndividualProfile'
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -316,10 +354,36 @@ paths:
       - accounts
       security:
       - jwtAuth: []
-      - {}
       responses:
         '204':
           description: No response body
+  /api/v1/accounts/signup/:
+    post:
+      operationId: accounts_signup_create
+      description: API endpoint that allows users to signup.
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Signup'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Signup'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Signup'
+        required: true
+      security:
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Signup'
+          description: ''
   /api/v1/accounts/token/:
     post:
       operationId: accounts_token_create
@@ -380,7 +444,6 @@ paths:
       - referrals
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -432,7 +495,6 @@ paths:
       - referrals
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -442,7 +504,7 @@ paths:
           description: ''
     put:
       operationId: referrals_products_update
-      description: ViewSet for the Product model.
+      description: Update an instance of the model using the provided serializer.
       parameters:
       - in: path
         name: uuid
@@ -517,6 +579,153 @@ paths:
           type: string
           format: uuid
         description: A UUID string identifying this Product.
+        required: true
+      tags:
+      - referrals
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/referrals/staff/:
+    get:
+      operationId: referrals_staff_list
+      description: ViewSet for the Staff model.
+      tags:
+      - referrals
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Staff'
+          description: ''
+    post:
+      operationId: referrals_staff_create
+      description: ViewSet for the Staff model.
+      tags:
+      - referrals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Staff'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Staff'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Staff'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+  /api/v1/referrals/staff/{id}/:
+    get:
+      operationId: referrals_staff_retrieve
+      description: ViewSet for the Staff model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Staff.
+        required: true
+      tags:
+      - referrals
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+    put:
+      operationId: referrals_staff_update
+      description: ViewSet for the Staff model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Staff.
+        required: true
+      tags:
+      - referrals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Staff'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Staff'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Staff'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+    patch:
+      operationId: referrals_staff_partial_update
+      description: ViewSet for the Staff model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Staff.
+        required: true
+      tags:
+      - referrals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStaff'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStaff'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStaff'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Staff'
+          description: ''
+    delete:
+      operationId: referrals_staff_destroy
+      description: ViewSet for the Staff model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Staff.
         required: true
       tags:
       - referrals
@@ -841,55 +1050,33 @@ components:
   schemas:
     CompanyProfile:
       type: object
-      description: Serializer for CompanyProfile
       properties:
-        user_id:
-          type: integer
-          readOnly: true
-        company_name:
-          type: string
-          maxLength: 100
-        company_registration_number:
-          type: string
-          maxLength: 50
-        phone_number:
-          type: string
-          maxLength: 15
-        address:
-          type: string
-          maxLength: 255
-        country:
-          type: string
-          maxLength: 50
-        user_type:
-          type: string
-          writeOnly: true
         email:
           type: string
           format: email
-          writeOnly: true
-        password:
-          type: string
-          writeOnly: true
-        is_active:
-          type: boolean
-          writeOnly: true
-          default: true
-        created_at:
-          type: string
-          format: date-time
           readOnly: true
+        name:
+          type: string
+        phone_number:
+          type: string
+        address:
+          type: string
+        country:
+          type: string
+        status:
+          type: string
+          readOnly: true
+        company_registration_number:
+          type: string
+          maxLength: 50
       required:
       - address
-      - company_name
       - company_registration_number
       - country
-      - created_at
       - email
-      - password
+      - name
       - phone_number
-      - user_id
-      - user_type
+      - status
     CustomUserTokenObtainPair:
       type: object
       description: Serializer for CustomUserTokenObtainPair
@@ -903,7 +1090,18 @@ components:
       required:
       - email
       - password
-    GenderEnum:
+    IndividualProfile:
+      type: object
+      description: Serializer for IndividualProfile
+      properties:
+        user:
+          type: integer
+        gender:
+          $ref: '#/components/schemas/IndividualProfileGenderEnum'
+      required:
+      - gender
+      - user
+    IndividualProfileGenderEnum:
       enum:
       - male
       - female
@@ -911,80 +1109,6 @@ components:
       description: |-
         * `male` - Male
         * `female` - Female
-    IndividualProfile:
-      type: object
-      description: Serializer for IndividualProfile
-      properties:
-        user_id:
-          type: integer
-          readOnly: true
-        first_name:
-          type: string
-          maxLength: 30
-        last_name:
-          type: string
-          maxLength: 30
-        gender:
-          $ref: '#/components/schemas/GenderEnum'
-        phone_number:
-          type: string
-          maxLength: 15
-        address:
-          type: string
-          maxLength: 255
-        country:
-          type: string
-          maxLength: 50
-        state:
-          type: string
-          maxLength: 50
-        city:
-          type: string
-          maxLength: 50
-        email:
-          type: string
-          format: email
-          writeOnly: true
-        password:
-          type: string
-          writeOnly: true
-        user_type:
-          type: string
-          writeOnly: true
-        status:
-          $ref: '#/components/schemas/IndividualProfileStatusEnum'
-        is_active:
-          type: boolean
-          writeOnly: true
-          default: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-      - address
-      - city
-      - country
-      - created_at
-      - email
-      - first_name
-      - gender
-      - last_name
-      - password
-      - phone_number
-      - state
-      - user_id
-      - user_type
-    IndividualProfileStatusEnum:
-      enum:
-      - pending
-      - approved
-      - declined
-      type: string
-      description: |-
-        * `pending` - Pending
-        * `approved` - Approved
-        * `declined` - Declined
     NameEnum:
       enum:
       - gold pro
@@ -1001,94 +1125,33 @@ components:
         * `platinum` - Platinum
     PatchedCompanyProfile:
       type: object
-      description: Serializer for CompanyProfile
       properties:
-        user_id:
-          type: integer
-          readOnly: true
-        company_name:
-          type: string
-          maxLength: 100
-        company_registration_number:
-          type: string
-          maxLength: 50
-        phone_number:
-          type: string
-          maxLength: 15
-        address:
-          type: string
-          maxLength: 255
-        country:
-          type: string
-          maxLength: 50
-        user_type:
-          type: string
-          writeOnly: true
         email:
           type: string
           format: email
-          writeOnly: true
-        password:
-          type: string
-          writeOnly: true
-        is_active:
-          type: boolean
-          writeOnly: true
-          default: true
-        created_at:
-          type: string
-          format: date-time
           readOnly: true
+        name:
+          type: string
+        phone_number:
+          type: string
+        address:
+          type: string
+        country:
+          type: string
+        status:
+          type: string
+          readOnly: true
+        company_registration_number:
+          type: string
+          maxLength: 50
     PatchedIndividualProfile:
       type: object
       description: Serializer for IndividualProfile
       properties:
-        user_id:
+        user:
           type: integer
-          readOnly: true
-        first_name:
-          type: string
-          maxLength: 30
-        last_name:
-          type: string
-          maxLength: 30
         gender:
-          $ref: '#/components/schemas/GenderEnum'
-        phone_number:
-          type: string
-          maxLength: 15
-        address:
-          type: string
-          maxLength: 255
-        country:
-          type: string
-          maxLength: 50
-        state:
-          type: string
-          maxLength: 50
-        city:
-          type: string
-          maxLength: 50
-        email:
-          type: string
-          format: email
-          writeOnly: true
-        password:
-          type: string
-          writeOnly: true
-        user_type:
-          type: string
-          writeOnly: true
-        status:
-          $ref: '#/components/schemas/IndividualProfileStatusEnum'
-        is_active:
-          type: boolean
-          writeOnly: true
-          default: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
+          $ref: '#/components/schemas/IndividualProfileGenderEnum'
     PatchedProduct:
       type: object
       description: Serializer for the Product model.
@@ -1132,6 +1195,26 @@ components:
           minimum: 0
         company:
           type: integer
+          readOnly: true
+    PatchedStaff:
+      type: object
+      description: Serializer for the Staff model.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        name:
+          type: string
+        phone_number:
+          type: string
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: string
           readOnly: true
     PatchedSupportTicket:
       type: object
@@ -1288,6 +1371,82 @@ components:
         * `whatsapp` - Whatsapp
         * `phone` - Phone
         * `website` - Website
+    RoleEnum:
+      enum:
+      - admin
+      - superadmin
+      type: string
+      description: |-
+        * `admin` - Admin
+        * `superadmin` - Superadmin
+    Signup:
+      type: object
+      description: Serializer for user signup.
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+        user_type:
+          $ref: '#/components/schemas/UserTypeEnum'
+        phone_number:
+          type: string
+        address:
+          type: string
+        country:
+          type: string
+        gender:
+          $ref: '#/components/schemas/SignupGenderEnum'
+        state:
+          type: string
+        city:
+          type: string
+        company_registration_number:
+          type: string
+      required:
+      - email
+      - name
+      - password
+      - user_type
+    SignupGenderEnum:
+      enum:
+      - male
+      - female
+      type: string
+      description: |-
+        * `male` - male
+        * `female` - female
+    Staff:
+      type: object
+      description: Serializer for the Staff model.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        name:
+          type: string
+        phone_number:
+          type: string
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: string
+          readOnly: true
+      required:
+      - email
+      - id
+      - is_active
+      - name
+      - phone_number
+      - role
     SupportEnum:
       enum:
       - support
@@ -1407,6 +1566,14 @@ components:
       description: |-
         * `enabled` - Enabled
         * `disabled` - Disabled
+    UserTypeEnum:
+      enum:
+      - individual
+      - company
+      type: string
+      description: |-
+        * `individual` - individual
+        * `company` - company
     VerifyAccount:
       type: object
       description: Serializer for verifying an account.

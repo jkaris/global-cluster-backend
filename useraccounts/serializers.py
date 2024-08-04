@@ -19,6 +19,20 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
     Serializer for IndividualProfile
     """
 
+    email = serializers.EmailField(source="user.email", read_only=True)
+    name = serializers.CharField(source="user.name", read_only=True)
+    phone_number = serializers.CharField(source="user.phone_number")
+    address = serializers.CharField(source="user.address")
+    country = serializers.CharField(source="user.country")
+    status = serializers.CharField(source="user.status", read_only=True)
+    user_type = serializers.CharField(source="user.user_type", read_only=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_user(**validated_data)
+        IndividualProfile.objects.create(user=user, **validated_data)
+        return user
+
     class Meta:
         """
         Meta class for IndividualProfileSerializer
@@ -28,40 +42,41 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
         fields = [
             "user",
             "gender",
-        ]
-
-
-class CompanyProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(source="user.email", read_only=True)
-    name = serializers.CharField(source="user.name")
-    phone_number = serializers.CharField(source="user.phone_number")
-    address = serializers.CharField(source="user.address")
-    country = serializers.CharField(source="user.country")
-    status = serializers.CharField(source="user.status", read_only=True)
-
-    class Meta:
-        model = CompanyProfile
-        fields = [
             "email",
             "name",
             "phone_number",
             "address",
             "country",
             "status",
-            "company_registration_number",
+            "user_type",
+            "user_id",
         ]
 
-    def update(self, instance, validated_data):
-        user_data = validated_data.pop("user", {})
-        for attr, value in user_data.items():
-            setattr(instance.user, attr, value)
-        instance.user.save()
 
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+class CompanyProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source="user.email", read_only=True)
+    name = serializers.CharField(source="user.name", read_only=True)
+    phone_number = serializers.CharField(source="user.phone_number")
+    address = serializers.CharField(source="user.address")
+    country = serializers.CharField(source="user.country")
+    status = serializers.CharField(source="user.status", read_only=True)
+    user_type = serializers.CharField(source="user.user_type", read_only=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
 
-        return instance
+    class Meta:
+        model = CompanyProfile
+        fields = "__all__"
+        # fields = [
+        #     "email",
+        #     "name",
+        #     "phone_number",
+        #     "address",
+        #     "country",
+        #     "status",
+        #     "user_type",
+        #     "user_id",
+        #     "company_registration_number",
+        # ]
 
 
 class SignupSerializer(serializers.Serializer):

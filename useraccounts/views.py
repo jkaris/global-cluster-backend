@@ -37,6 +37,8 @@ class SignupView(generics.CreateAPIView):
             "phone_number": user.phone_number,
             "address": user.address,
             "country": user.country,
+            "state": user.state,
+            "city": user.city,
             "date_joined": user.date_joined,
             "status": user.status,
             "refresh": str(refresh),
@@ -48,8 +50,6 @@ class SignupView(generics.CreateAPIView):
             response_data.update(
                 {
                     "gender": profile.gender,
-                    "state": profile.state,
-                    "city": profile.city,
                 }
             )
         elif user.user_type == "company":
@@ -61,38 +61,6 @@ class SignupView(generics.CreateAPIView):
             )
 
         return Response(response_data, status=status.HTTP_201_CREATED)
-
-
-class CompanyProfileView(generics.RetrieveUpdateAPIView):
-    serializer_class = CompanyProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_object(self):
-        return CompanyProfile.objects.get(user=self.request.user)
-
-    def get(self, request, *args, **kwargs):
-        profile = self.get_object()
-        serializer = self.get_serializer(profile)
-        return Response(serializer.data)
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        if getattr(instance, "_prefetched_objects_cache", None):
-            instance._prefetched_objects_cache = {}
-
-        return Response(serializer.data)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    def patch(self, request, *args, **kwargs):
-        kwargs["partial"] = True
-        return self.update(request, *args, **kwargs)
 
 
 class IndividualProfileViewSet(viewsets.ModelViewSet):
@@ -127,41 +95,64 @@ class IndividualProfileViewSet(viewsets.ModelViewSet):
 
 
 class CompanyProfileViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-
     queryset = CompanyProfile.objects.all()
     serializer_class = CompanyProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        """
-        Create and return a new `CompanyProfile` instance, given the validated data.
-        :param request:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        serializer = self.get_serializer(data=request.data)
+    def get_queryset(self):
+        user = self.request.user
+        if user.user_type == "admin" or user.user_type == "company":
+            return CompanyProfile.objects.all()
+        return CompanyProfile.objects.filter(user=user)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
-        # Generate tokens
-        user = serializer.instance.user
-        refresh = RefreshToken.for_user(user)
-        access = refresh.access_token
+    # def get_queryset(self):
+    #     return CompanyProfile.objects.filter(user=self.request.user)
+    #
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #
+    #     user = serializer.instance.user
+    #     refresh = RefreshToken.for_user(user)
+    #     access = refresh.access_token
+    #
+    #     response_data = serializer.data
+    #     response_data.update({
+    #         "name": user.name,
+    #         "user_id": user.id,
+    #         "email": user.email,
+    #         "created_at": user.date_joined,
+    #         "status": user.status,
+    #         "user_type": user.user_type,
+    #         "refresh": str(refresh),
+    #         "access": str(access)
+    #     })
+    #
+    #     return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
-        # Include the user_id in the response
-        response_data = serializer.data
-        response_data["user_id"] = serializer.instance.user.id
-        response_data["email"] = serializer.instance.user.email
-        response_data["created_at"] = serializer.instance.date_joined
-        response_data["status"] = serializer.instance.status
-        response_data["refresh"] = str(refresh)
-        response_data["access"] = str(access)
-
-        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        data.update({
+            "name": instance.user.name,
+            "user_id": instance.user.id,
+            "email": instance.user.email,
+            "created_at": instance.user.date_joined,
+            "status": instance.user.status,
+            "user_type": instance.user.user_type
+        })
+        return Response(data)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):

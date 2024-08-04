@@ -3,6 +3,10 @@ from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
+import dj_database_url
+
+
+
 load_dotenv()  # Load environment variables from a .env file
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -73,6 +77,11 @@ DATABASES = {
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+db_from_env = dj_database_url.config(default=DATABASE_URL, conn_max_age=500)
+DATABASES["default"].update(db_from_env)
 
 AUTH_PASSWORD_VALIDATORS = [
     {

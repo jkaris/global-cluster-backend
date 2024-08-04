@@ -27,6 +27,8 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
     status = serializers.CharField(source="user.status", read_only=True)
     user_type = serializers.CharField(source="user.user_type", read_only=True)
     user_id = serializers.IntegerField(source="user.id", read_only=True)
+    state = serializers.CharField(source="user.state", required=False, allow_blank=True)
+    city = serializers.CharField(source="user.city", required=False, allow_blank=True)
 
     def create(self, validated_data):
         user = CustomUser.objects.create_user(**validated_data)
@@ -50,33 +52,63 @@ class IndividualProfileSerializer(serializers.ModelSerializer):
             "status",
             "user_type",
             "user_id",
+            "state",
+            "city",
         ]
 
 
 class CompanyProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
     name = serializers.CharField(source="user.name", read_only=True)
-    phone_number = serializers.CharField(source="user.phone_number")
-    address = serializers.CharField(source="user.address")
-    country = serializers.CharField(source="user.country")
+    phone_number = serializers.CharField(
+        source="user.phone_number", required=False, allow_blank=True
+    )
+    address = serializers.CharField(
+        source="user.address", required=False, allow_blank=True
+    )
+    country = serializers.CharField(
+        source="user.country", required=False, allow_blank=True
+    )
     status = serializers.CharField(source="user.status", read_only=True)
     user_type = serializers.CharField(source="user.user_type", read_only=True)
     user_id = serializers.IntegerField(source="user.id", read_only=True)
+    company_registration_number = serializers.CharField(
+        required=False, allow_blank=True
+    )
+    state = serializers.CharField(source="user.state", required=False, allow_blank=True)
+    city = serializers.CharField(source="user.city", required=False, allow_blank=True)
 
     class Meta:
         model = CompanyProfile
-        fields = "__all__"
-        # fields = [
-        #     "email",
-        #     "name",
-        #     "phone_number",
-        #     "address",
-        #     "country",
-        #     "status",
-        #     "user_type",
-        #     "user_id",
-        #     "company_registration_number",
-        # ]
+        fields = [
+            "email",
+            "name",
+            "phone_number",
+            "address",
+            "country",
+            "status",
+            "user_type",
+            "user_id",
+            "company_registration_number",
+            "state",
+            "city",
+        ]
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user", {})
+        user = instance.user
+
+        for attr, value in user_data.items():
+            if value is not None:  # Only update if a value is provided
+                setattr(user, attr, value)
+        user.save()
+
+        for attr, value in validated_data.items():
+            if value is not None:  # Only update if a value is provided
+                setattr(instance, attr, value)
+        instance.save()
+
+        return instance
 
 
 class SignupSerializer(serializers.Serializer):
@@ -94,8 +126,8 @@ class SignupSerializer(serializers.Serializer):
 
     # Fields for individual
     gender = serializers.ChoiceField(choices=["male", "female"], required=False)
-    state = serializers.CharField(required=False)
-    city = serializers.CharField(required=False)
+    # state = serializers.CharField(required=False)
+    # city = serializers.CharField(required=False)
 
     # Field for company
     company_registration_number = serializers.CharField(required=False)
@@ -129,7 +161,7 @@ class SignupSerializer(serializers.Serializer):
         user_type = data.get("user_type")
 
         if user_type == "individual":
-            required_fields = ["gender", "state", "city"]
+            required_fields = ["gender"]
         elif user_type == "company":
             required_fields = ["company_registration_number"]
         else:

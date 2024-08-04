@@ -1,7 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-ra!^g%m88wr5l-n)@eifk-6fw$1vwv=+p76d056^0zn93^-%fn"

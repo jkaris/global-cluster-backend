@@ -106,53 +106,20 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
         return CompanyProfile.objects.filter(user=user)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+
+        if getattr(instance, "_prefetched_objects_cache", None):
+            instance._prefetched_objects_cache = {}
+
         return Response(serializer.data)
 
-    # def get_queryset(self):
-    #     return CompanyProfile.objects.filter(user=self.request.user)
-    #
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #
-    #     user = serializer.instance.user
-    #     refresh = RefreshToken.for_user(user)
-    #     access = refresh.access_token
-    #
-    #     response_data = serializer.data
-    #     response_data.update({
-    #         "name": user.name,
-    #         "user_id": user.id,
-    #         "email": user.email,
-    #         "created_at": user.date_joined,
-    #         "status": user.status,
-    #         "user_type": user.user_type,
-    #         "refresh": str(refresh),
-    #         "access": str(access)
-    #     })
-    #
-    #     return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        data = serializer.data
-        data.update({
-            "name": instance.user.name,
-            "user_id": instance.user.id,
-            "email": instance.user.email,
-            "created_at": instance.user.date_joined,
-            "status": instance.user.status,
-            "user_type": instance.user.user_type
-        })
-        return Response(data)
+    def partial_update(self, request, *args, **kwargs):
+        kwargs["partial"] = True
+        return self.update(request, *args, **kwargs)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
